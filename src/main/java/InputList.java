@@ -12,15 +12,20 @@ public class InputList {
     private int itemCount;
 
     /**
-     * Stores an input when there is remaining space in the list.
+     * Stores a task when there is remaining space in the list.
      *
-     * @param input the input to store
+     * @param task the task to store
      */
-    public void add(String input) {
+    public void addTask(Task task) {
         if (itemCount < MAX_INPUTS) {
-            items[itemCount] = new Task(input);
+            items[itemCount] = task;
             itemCount++;
         }
+        System.out.println("\t_________________________________________\n" +
+                "\tTask added to list:\n\t" +
+                task.taskIdentifier() + task.toString() + "\n" +
+                "\tYou have " + itemCount + " tasks in the list\n" +
+                "\t_________________________________________\n");
     }
 
     /**
@@ -30,7 +35,8 @@ public class InputList {
         System.out.println("\t_________________________________________\n" +
                 "\tHere are your current tasks:\n");
         for (int i = 0; i < itemCount; i++) {
-            System.out.println("\t" + (i + 1) + ". " + items[i].toString());
+            System.out.println("\t" + (i + 1) + ". " + items[i].taskIdentifier()
+                    + items[i].toString());
         }
         System.out.println("\t_________________________________________\n");
     }
@@ -39,7 +45,7 @@ public class InputList {
      * Marks task located at index completed
      */
     public void complete(int index) {
-        items[index - 1] = items[index - 1].complete();
+        items[index - 1].complete();
         System.out.println("\t_________________________________________\n" +
                 "\tTask marked as done:\n\t" +
                 items[index - 1].toString() +
@@ -51,7 +57,7 @@ public class InputList {
      * Unmarks task located at index completed
      */
     public void uncomplete(int index) {
-        items[index - 1] = items[index - 1].uncomplete();
+        items[index - 1].uncomplete();
         System.out.println("\t_________________________________________\n" +
                 "\tTask unmarked as done:\n\t" +
                 items[index - 1].toString() +

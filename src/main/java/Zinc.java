@@ -31,9 +31,16 @@ public class Zinc {
                 inputs.complete(Integer.parseInt(input.replaceAll("[^0-9]", "")));
             } else if (input.startsWith("unmark")) {
                 inputs.uncomplete(Integer.parseInt(input.replaceAll("[^0-9]", "")));
+            } else if (input.startsWith("todo")) {
+                inputs.addTask(new Todo(input.substring(4).trim()));
+            } else if (input.startsWith("deadline")) {
+                String[] parameters = input.split("/by");
+                inputs.addTask(new Deadline(parameters[0].substring(8).trim(), parameters[1].trim()));
+            } else if (input.startsWith("event")) {
+                String[] parameters = input.split("/from|/to");
+                inputs.addTask(new Event(parameters[0].substring(5).trim(), parameters[1].trim(), parameters[2].trim()));
             } else if (!input.equals("bye")) {
-                inputs.add(input);
-                System.out.println("\t" + input);
+                System.out.println("\tSorry, I don't know what you mean.\n");
             }
         } while (!input.equals("bye"));
 

@@ -1,12 +1,10 @@
 /**
  * Represents a task with a description and completion status.
  *
- * <p>Tasks are immutable: methods that change the completion status return a
- * new {@code Task} instance instead of modifying the existing one.</p>
  */
-public class Task {
+public abstract class Task {
     private final String taskName;
-    private final boolean completed;
+    private boolean completed;
 
     /**
      * Creates a new task.
@@ -19,32 +17,17 @@ public class Task {
     }
 
     /**
-     * Creates a task with a specified completion status.
      *
-     * @param name the description of the task
-     * @param state whether the task is complete
      */
-    private Task(String name, boolean state) {
-        this.taskName = name;
-        this.completed = state;
+    void complete() {
+        this.completed = true;
     }
 
     /**
-     * Returns a completed version of this task.
-     *
-     * @return a new task with the same description, marked as complete
+     * Uncompletes the task
      */
-    Task complete() {
-        return new Task(this.taskName, true);
-    }
-
-    /**
-     * Returns an incomplete version of this task.
-     *
-     * @return a new task with the same description, marked as incomplete
-     */
-    Task uncomplete() {
-        return new Task(this.taskName, false);
+    void uncomplete() {
+        this.completed = false;
     }
 
     /**
@@ -70,4 +53,6 @@ public class Task {
             return "[ ] " + taskName;
         }
     }
+
+    abstract public String taskIdentifier();
 }
