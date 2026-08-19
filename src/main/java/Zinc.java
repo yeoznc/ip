@@ -7,5 +7,11 @@ public class Zinc {
                 + " / /___| | | | | (__ \n"
                 + "/______|_|_| |_|\\___|\n";
         System.out.println(banner);
+        System.out.println("Hello, my name's Zinc.\n" +
+                "What can I do for you?\n" +
+                "_________________________________________");
+
+        System.out.println("Goodbye.\n" +
+                "_________________________________________");
     }
 }
