@@ -6,7 +6,7 @@ public class InputList {
     private static final int MAX_INPUTS = 100;
 
     /** The stored user inputs. */
-    private final String[] items = new String[MAX_INPUTS];
+    private final Task[] items = new Task[MAX_INPUTS];
 
     /** The number of inputs currently stored. */
     private int itemCount;
@@ -18,7 +18,7 @@ public class InputList {
      */
     public void add(String input) {
         if (itemCount < MAX_INPUTS) {
-            items[itemCount] = input;
+            items[itemCount] = new Task(input);
             itemCount++;
         }
     }
@@ -27,8 +27,34 @@ public class InputList {
      * Prints every stored input with its list number.
      */
     public void printItems() {
+        System.out.println("\t_________________________________________\n" +
+                "\tHere are your current tasks:\n");
         for (int i = 0; i < itemCount; i++) {
-            System.out.println("\t" + (i + 1) + ". " + items[i]);
+            System.out.println("\t" + (i + 1) + ". " + items[i].toString());
         }
+        System.out.println("\t_________________________________________\n");
+    }
+
+    /**
+     * Marks task located at index completed
+     */
+    public void complete(int index) {
+        items[index - 1] = items[index - 1].complete();
+        System.out.println("\t_________________________________________\n" +
+                "\tTask marked as done:\n\t" +
+                items[index - 1].toString() +
+                "\n\t_________________________________________\n");
+
+    }
+
+    /**
+     * Unmarks task located at index completed
+     */
+    public void uncomplete(int index) {
+        items[index - 1] = items[index - 1].uncomplete();
+        System.out.println("\t_________________________________________\n" +
+                "\tTask unmarked as done:\n\t" +
+                items[index - 1].toString() +
+                "\n\t_________________________________________\n");
     }
 }

@@ -27,6 +27,10 @@ public class Zinc {
             input = scanner.nextLine();
             if (input.equals("list")) {
                 inputs.printItems();
+            } else if (input.startsWith("mark")) {
+                inputs.complete(Integer.parseInt(input.replaceAll("[^0-9]", "")));
+            } else if (input.startsWith("unmark")) {
+                inputs.uncomplete(Integer.parseInt(input.replaceAll("[^0-9]", "")));
             } else if (!input.equals("bye")) {
                 inputs.add(input);
                 System.out.println("\t" + input);
