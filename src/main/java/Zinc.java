@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class Zinc {
     public static void main(String[] args) {
         String banner = " ______ _            \n"
@@ -11,7 +13,16 @@ public class Zinc {
                 "What can I do for you?\n" +
                 "_________________________________________");
 
-        System.out.println("Goodbye.\n" +
+        Scanner scanner = new Scanner(System.in);
+        String input;
+
+        do {
+            input = scanner.nextLine();
+            System.out.println("\t" + input);
+        } while (!input.equals("bye"));
+
+        System.out.println("_________________________________________\n" +
+                "Goodbye.\n" +
                 "_________________________________________");
     }
 }
