@@ -1,6 +1,12 @@
 import java.util.Scanner;
 
 public class Zinc {
+    /**
+     * Starts Zinc and handles terminal input until the user enters {@code bye}.
+     * Enter {@code list} to display all previously stored inputs.
+     *
+     * @param args command-line arguments, which are not used
+     */
     public static void main(String[] args) {
         String banner = " ______ _            \n"
                 + "|___  /(_)           \n"
@@ -15,10 +21,16 @@ public class Zinc {
 
         Scanner scanner = new Scanner(System.in);
         String input;
+        InputList inputs = new InputList();
 
         do {
             input = scanner.nextLine();
-            System.out.println("\t" + input);
+            if (input.equals("list")) {
+                inputs.printItems();
+            } else if (!input.equals("bye")) {
+                inputs.add(input);
+                System.out.println("\t" + input);
+            }
         } while (!input.equals("bye"));
 
         System.out.println("_________________________________________\n" +
