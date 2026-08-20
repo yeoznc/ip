@@ -45,6 +45,10 @@ public class InputList {
      * Marks task located at index completed
      */
     public void complete(int index) {
+        if(itemCount < index || index <= 0) {
+            System.out.println("\tNo such task found\n");
+            return;
+        }
         items[index - 1].complete();
         System.out.println("\t_________________________________________\n" +
                 "\tTask marked as done:\n\t" +
@@ -57,10 +61,43 @@ public class InputList {
      * Unmarks task located at index completed
      */
     public void uncomplete(int index) {
+        if(itemCount < index || index <= 0) {
+            System.out.println("\tNo such task found\n");
+            return;
+        }
         items[index - 1].uncomplete();
         System.out.println("\t_________________________________________\n" +
                 "\tTask unmarked as done:\n\t" +
                 items[index - 1].toString() +
                 "\n\t_________________________________________\n");
+    }
+
+    /**
+     * Deletes the task at the user-facing list number.
+     *
+     * @param index the task number shown to the user, starting from 1
+     */
+    public void delete(int index) {
+        int arrayIndex = index - 1;
+
+        if (arrayIndex < 0 || arrayIndex >= itemCount) {
+            System.out.println("\tNo such task found\n");
+            return;
+        }
+
+        Task deletedTask = items[arrayIndex];
+
+        for (int i = arrayIndex; i < itemCount - 1; i++) {
+            items[i] = items[i + 1];
+        }
+
+        itemCount--;
+        items[itemCount] = null;
+
+        System.out.println("\t_________________________________________\n"
+                + "\tTask deleted:\n\t"
+                + deletedTask.taskIdentifier() + deletedTask + "\n"
+                + "\tYou have " + itemCount + " tasks in the list\n"
+                + "\t_________________________________________\n");
     }
 }

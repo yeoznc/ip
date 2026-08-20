@@ -29,16 +29,18 @@ public class Parser {
             return true;
         } else if (command.equals("list") && parameters.isEmpty()) {
             inputs.printItems();
-        } else if (command.equals("mark") && !parameters.isEmpty()) {
-            inputs.complete(Integer.parseInt(parameters));
-        } else if (command.equals("unmark") && !parameters.isEmpty()) {
-            inputs.uncomplete(Integer.parseInt(parameters));
+        } else if (command.equals("mark")) {
+            markTask(parameters);
+        } else if (command.equals("unmark")) {
+            unmarkTask(parameters);
         } else if (command.equals("todo")) {
             addTodo(parameters);
         } else if (command.equals("deadline")) {
             addDeadline(parameters);
         } else if (command.equals("event")) {
             addEvent(parameters);
+        } else if(command.equals("delete")) {
+            deleteTask(parameters);
         } else if (command.equals("help")) {
             System.out.println("\tAvailable commands:\n" +
                     "\tmark\n" +
@@ -95,5 +97,32 @@ public class Parser {
             return;
         }
         inputs.addTask(new Event(eventParts[0].trim(), eventParts[1].trim(), eventParts[2].trim()));
+    }
+
+    /** Marks the task at the supplied user-facing task number as complete. */
+    private void markTask(String parameters) {
+        try {
+            inputs.complete(Integer.parseInt(parameters));
+        } catch (NumberFormatException exception) {
+            System.out.println("\tTask number must be an integer. Usage: mark <task number>\n");
+        }
+    }
+
+    /** Marks the task at the supplied user-facing task number as incomplete. */
+    private void unmarkTask(String parameters) {
+        try {
+            inputs.uncomplete(Integer.parseInt(parameters));
+        } catch (NumberFormatException exception) {
+            System.out.println("\tTask number must be an integer. Usage: unmark <task number>\n");
+        }
+    }
+
+    /** Deletes the task at the supplied user-facing task number. */
+    private void deleteTask(String parameters) {
+        try {
+            inputs.delete(Integer.parseInt(parameters));
+        } catch (NumberFormatException exception) {
+            System.out.println("\tTask number must be an integer. Usage: delete <task number>\n");
+        }
     }
 }

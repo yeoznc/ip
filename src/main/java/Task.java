@@ -17,7 +17,7 @@ public abstract class Task {
     }
 
     /**
-     *
+     * Completes the task
      */
     void complete() {
         this.completed = true;
