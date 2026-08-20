@@ -20,29 +20,10 @@ public class Zinc {
                 "_________________________________________");
 
         Scanner scanner = new Scanner(System.in);
-        String input;
         InputList inputs = new InputList();
+        Parser parser = new Parser(inputs);
 
-        do {
-            input = scanner.nextLine();
-            if (input.equals("list")) {
-                inputs.printItems();
-            } else if (input.startsWith("mark")) {
-                inputs.complete(Integer.parseInt(input.replaceAll("[^0-9]", "")));
-            } else if (input.startsWith("unmark")) {
-                inputs.uncomplete(Integer.parseInt(input.replaceAll("[^0-9]", "")));
-            } else if (input.startsWith("todo")) {
-                inputs.addTask(new Todo(input.substring(4).trim()));
-            } else if (input.startsWith("deadline")) {
-                String[] parameters = input.split("/by");
-                inputs.addTask(new Deadline(parameters[0].substring(8).trim(), parameters[1].trim()));
-            } else if (input.startsWith("event")) {
-                String[] parameters = input.split("/from|/to");
-                inputs.addTask(new Event(parameters[0].substring(5).trim(), parameters[1].trim(), parameters[2].trim()));
-            } else if (!input.equals("bye")) {
-                System.out.println("\tSorry, I don't know what you mean.\n");
-            }
-        } while (!input.equals("bye"));
+        while (!parser.parse(scanner.nextLine())) {}
 
         System.out.println("_________________________________________\n" +
                 "Goodbye.\n" +
