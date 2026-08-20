@@ -8,8 +8,8 @@ public class Event extends Task{
         this.end = end;
     }
 
-    public String taskIdentifier() {
-        return "[E]";
+    public TaskType getTaskType() {
+        return TaskType.EVENT;
     }
 
     public String toString() {

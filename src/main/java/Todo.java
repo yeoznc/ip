@@ -3,7 +3,7 @@ public class Todo extends Task {
         super(name);
     }
 
-    public String taskIdentifier() {
-        return "[T]";
+    public TaskType getTaskType() {
+        return TaskType.TODO;
     }
 }

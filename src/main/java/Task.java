@@ -54,5 +54,10 @@ public abstract class Task {
         }
     }
 
-    abstract public String taskIdentifier();
+    /**
+     * Returns this task's category.
+     *
+     * @return the type of this task
+     */
+    public abstract TaskType getTaskType();
 }

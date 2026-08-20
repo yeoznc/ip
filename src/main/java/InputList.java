@@ -23,7 +23,7 @@ public class InputList {
         }
         System.out.println("\t_________________________________________\n" +
                 "\tTask added to list:\n\t" +
-                task.taskIdentifier() + task.toString() + "\n" +
+                task.getTaskType().getDisplayIdentifier() + task.toString() + "\n" +
                 "\tYou have " + itemCount + " tasks in the list\n" +
                 "\t_________________________________________\n");
     }
@@ -35,7 +35,7 @@ public class InputList {
         System.out.println("\t_________________________________________\n" +
                 "\tHere are your current tasks:\n");
         for (int i = 0; i < itemCount; i++) {
-            System.out.println("\t" + (i + 1) + ". " + items[i].taskIdentifier()
+            System.out.println("\t" + (i + 1) + ". " + items[i].getTaskType().getDisplayIdentifier()
                     + items[i].toString());
         }
         System.out.println("\t_________________________________________\n");
@@ -96,7 +96,7 @@ public class InputList {
 
         System.out.println("\t_________________________________________\n"
                 + "\tTask deleted:\n\t"
-                + deletedTask.taskIdentifier() + deletedTask + "\n"
+                + deletedTask.getTaskType().getDisplayIdentifier() + deletedTask + "\n"
                 + "\tYou have " + itemCount + " tasks in the list\n"
                 + "\t_________________________________________\n");
     }

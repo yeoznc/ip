@@ -6,8 +6,8 @@ public class Deadline extends Task{
         this.deadline = deadline;
     }
 
-    public String taskIdentifier() {
-        return "[D]";
+    public TaskType getTaskType() {
+        return TaskType.DEADLINE;
     }
 
     public String toString() {
