@@ -3,7 +3,7 @@
  *
  */
 public abstract class Task {
-    private final String taskName;
+    public final String taskName;
     private boolean completed;
 
     /**
