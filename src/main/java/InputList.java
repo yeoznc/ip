@@ -11,6 +11,21 @@ public class InputList {
     /** The number of inputs currently stored. */
     private int itemCount;
 
+    /** The component responsible for persisting the task list. */
+    private final TaskStorage storage = new TaskStorage();
+
+    /**
+     * Creates a task list and restores tasks saved by a previous run.
+     */
+    public InputList() {
+        for (Task task : storage.loadTasks()) {
+            if (itemCount == MAX_INPUTS) {
+                break;
+            }
+            items[itemCount++] = task;
+        }
+    }
+
     /**
      * Stores a task when there is remaining space in the list.
      *
@@ -20,6 +35,7 @@ public class InputList {
         if (itemCount < MAX_INPUTS) {
             items[itemCount] = task;
             itemCount++;
+            saveTasks();
         }
         System.out.println("\t_________________________________________\n" +
                 "\tTask added to list:\n\t" +
@@ -50,6 +66,7 @@ public class InputList {
             return;
         }
         items[index - 1].complete();
+        saveTasks();
         System.out.println("\t_________________________________________\n" +
                 "\tTask marked as done:\n\t" +
                 items[index - 1].toString() +
@@ -66,6 +83,7 @@ public class InputList {
             return;
         }
         items[index - 1].uncomplete();
+        saveTasks();
         System.out.println("\t_________________________________________\n" +
                 "\tTask unmarked as done:\n\t" +
                 items[index - 1].toString() +
@@ -93,11 +111,17 @@ public class InputList {
 
         itemCount--;
         items[itemCount] = null;
+        saveTasks();
 
         System.out.println("\t_________________________________________\n"
                 + "\tTask deleted:\n\t"
                 + deletedTask.getTaskType().getDisplayIdentifier() + deletedTask + "\n"
                 + "\tYou have " + itemCount + " tasks in the list\n"
                 + "\t_________________________________________\n");
+    }
+
+    /** Saves the current list after a task has been changed. */
+    private void saveTasks() {
+        storage.saveTasks(items, itemCount);
     }
 }
