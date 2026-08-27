@@ -45,6 +45,7 @@ public class InputList {
             itemCount++;
             saveTasks();
         }
+
         System.out.println("\t_________________________________________\n"
                 + "\tTask added to list:\n\t"
                 + task.getTaskType().getDisplayIdentifier() + task.toString() + "\n"
@@ -155,6 +156,16 @@ public class InputList {
                 + deletedTask.getTaskType().getDisplayIdentifier() + deletedTask + "\n"
                 + "\tYou have " + itemCount + " tasks in the list\n"
                 + "\t_________________________________________\n");
+    }
+
+    /** Getter for tasks */
+    public Task[] getTasks() {
+        return items;
+    }
+
+    /** Getter for itemCount */
+    public int getItemCount() {
+        return itemCount;
     }
 
     /** Saves the current list after a task has been changed. */
