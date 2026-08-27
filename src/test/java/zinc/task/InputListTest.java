@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -149,5 +151,24 @@ public class InputListTest {
         inputList.printTasksEndingOn(LocalDate.of(2026, 8, 27));
 
         assertEquals("Submit report", inputList.getTasks()[0].getTaskName());
+    }
+
+    @Test
+    public void printTasksContaining_success() {
+        InputList inputList = new InputList();
+        inputList.addTask(new Todo("Buy bread"));
+        inputList.addTask(new Todo("Read book"));
+
+        PrintStream originalOutput = System.out;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+        try {
+            inputList.printTasksContaining("bread");
+        } finally {
+            System.setOut(originalOutput);
+        }
+
+        assertTrue(output.toString().contains("Buy bread"));
+        assertFalse(output.toString().contains("Read book"));
     }
 }

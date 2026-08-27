@@ -12,6 +12,7 @@ public class Ui {
             "deadline",
             "delete",
             "event",
+            "find",
             "help",
             "list",
             "mark",
@@ -51,6 +52,9 @@ public class Ui {
                 + "\t\tAdds an Event task\n"
                 + "\t\tUsage: event <description> /from <DD/MM/YY Optional[HH:MM]>"
                 + " /to <DD/MM/YY Optional[HH:MM]>\n"
+                + "\tfind\n"
+                + "\t\tFinds tasks whose descriptions contain a keyword\n"
+                + "\t\tUsage: find <keyword>\n"
                 + "\thelp\n"
                 + "\t\tShows this help list\n"
                 + "\t\tUsage: help\n"
