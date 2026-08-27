@@ -49,7 +49,7 @@ public abstract class Task {
      */
     @Override
     public String toString() {
-        if(completed) {
+        if (completed) {
             return "[X] " + taskName;
         } else {
             return "[ ] " + taskName;

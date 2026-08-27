@@ -121,14 +121,14 @@ public class TaskStorage {
         String status = task.isCompleted() ? "1" : "0";
         switch (task.getTaskType()) {
             case TODO:
-            return "T | " + status + " | " + task.taskName;
+                return "T | " + status + " | " + task.taskName;
             case DEADLINE:
                 Deadline deadline = (Deadline) task;
-            return "D | " + status + " | " + deadline.taskName + " | " + deadline.deadline;
+                return "D | " + status + " | " + deadline.taskName + " | " + deadline.deadline;
             case EVENT:
                 Event event = (Event) task;
-            return "E | " + status + " | " + event.taskName
-                    + " | " + event.start + " | " + event.end;
+                return "E | " + status + " | " + event.taskName
+                        + " | " + event.start + " | " + event.end;
             default:
                 throw new IllegalArgumentException("Unsupported task type");
         }

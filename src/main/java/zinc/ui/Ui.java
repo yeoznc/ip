@@ -31,49 +31,49 @@ public class Ui {
 
     /** Prints the opening greeting. */
     public void printGreeting() {
-        System.out.println("Hello, my name's Zinc.\n" +
-                "What can I do for you?\n" +
-                "_________________________________________");
+        System.out.println("Hello, my name's Zinc.\n"
+                + "What can I do for you?\n"
+                + "_________________________________________");
     }
 
     /** Prints the currently supported commands and their usage. */
     public void printHelp() {
-        System.out.println("\tAvailable commands:\n" +
-                "\tbye\n" +
-                "\t\tExits\n" +
-                "\tdeadline\n" +
-                "\t\tAdds a Deadline task\n" +
-                "\t\tUsage: deadline <description> /by <DD/MM/YY Optional[HH:MM]>\n" +
-                "\tdelete\n" +
-                "\t\tDeletes a task\n" +
-                "\t\tUsage: delete <task number>\n" +
-                "\tevent\n" +
-                "\t\tAdds an Event task\n" +
-                "\t\tUsage: event <description> /from <DD/MM/YY Optional[HH:MM]>"
-                        + " /to <DD/MM/YY Optional[HH:MM]>\n" +
-                "\thelp\n" +
-                "\t\tShows this help list\n" +
-                "\t\tUsage: help\n" +
-                "\tlist\n" +
-                "\t\tLists all added tasks\n" +
-                "\t\tUsage: list\n" +
-                "\t\tUsage: list <DD/MM/YY> to list deadlines and events ending that day\n" +
-                "\tmark\n" +
-                "\t\tMarks task as done\n" +
-                "\t\tUsage: mark <task number>\n" +
-                "\ttodo\n" +
-                "\t\tAdds a ToDo task\n" +
-                "\t\tUsage: todo <description>\n" +
-                "\tunmark\n" +
-                "\t\tMarks task as undone\n" +
-                "\t\tUsage: unmark <task number>\n");
+        System.out.println("\tAvailable commands:\n"
+                + "\tbye\n"
+                + "\t\tExits\n"
+                + "\tdeadline\n"
+                + "\t\tAdds a Deadline task\n"
+                + "\t\tUsage: deadline <description> /by <DD/MM/YY Optional[HH:MM]>\n"
+                + "\tdelete\n"
+                + "\t\tDeletes a task\n"
+                + "\t\tUsage: delete <task number>\n"
+                + "\tevent\n"
+                + "\t\tAdds an Event task\n"
+                + "\t\tUsage: event <description> /from <DD/MM/YY Optional[HH:MM]>"
+                + " /to <DD/MM/YY Optional[HH:MM]>\n"
+                + "\thelp\n"
+                + "\t\tShows this help list\n"
+                + "\t\tUsage: help\n"
+                + "\tlist\n"
+                + "\t\tLists all added tasks\n"
+                + "\t\tUsage: list\n"
+                + "\t\tUsage: list <DD/MM/YY> to list deadlines and events ending that day\n"
+                + "\tmark\n"
+                + "\t\tMarks task as done\n"
+                + "\t\tUsage: mark <task number>\n"
+                + "\ttodo\n"
+                + "\t\tAdds a ToDo task\n"
+                + "\t\tUsage: todo <description>\n"
+                + "\tunmark\n"
+                + "\t\tMarks task as undone\n"
+                + "\t\tUsage: unmark <task number>\n");
     }
 
     /** Prints the closing message. */
     public void printGoodbye() {
-        System.out.println("_________________________________________\n" +
-                "Goodbye.\n" +
-                "_________________________________________");
+        System.out.println("_________________________________________\n"
+                + "Goodbye.\n"
+                + "_________________________________________");
     }
 
     /**
