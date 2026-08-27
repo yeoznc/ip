@@ -6,6 +6,7 @@ import zinc.task.InputList;
 import zinc.ui.Parser;
 import zinc.ui.Ui;
 
+/** Runs the Zinc task-management application. */
 public class Zinc {
     /**
      * Starts Zinc and handles terminal input until the user enters {@code bye}.

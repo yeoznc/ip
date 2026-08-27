@@ -45,19 +45,19 @@ public class InputList {
             itemCount++;
             saveTasks();
         }
-        System.out.println("\t_________________________________________\n" +
-                "\tTask added to list:\n\t" +
-                task.getTaskType().getDisplayIdentifier() + task.toString() + "\n" +
-                "\tYou have " + itemCount + " tasks in the list\n" +
-                "\t_________________________________________\n");
+        System.out.println("\t_________________________________________\n"
+                + "\tTask added to list:\n\t"
+                + task.getTaskType().getDisplayIdentifier() + task.toString() + "\n"
+                + "\tYou have " + itemCount + " tasks in the list\n"
+                + "\t_________________________________________\n");
     }
 
     /**
      * Prints every stored input with its list number.
      */
     public void printItems() {
-        System.out.println("\t_________________________________________\n" +
-                "\tHere are your current tasks:\n");
+        System.out.println("\t_________________________________________\n"
+                + "\tHere are your current tasks:\n");
         for (int i = 0; i < itemCount; i++) {
             System.out.println("\t" + (i + 1) + ". " + items[i].getTaskType().getDisplayIdentifier()
                     + items[i].toString());
@@ -72,8 +72,8 @@ public class InputList {
      * @param date the date on which matching tasks end
      */
     public void printTasksEndingOn(LocalDate date) {
-        System.out.println("\t_________________________________________\n" +
-                "\tHere are your tasks ending on " + date.format(DISPLAY_DATE_FORMAT) + ":\n");
+        System.out.println("\t_________________________________________\n"
+                + "\tHere are your tasks ending on " + date.format(DISPLAY_DATE_FORMAT) + ":\n");
         for (int i = 0; i < itemCount; i++) {
             if (endsOn(items[i], date)) {
                 System.out.println("\t" + (i + 1) + ". "
@@ -98,16 +98,16 @@ public class InputList {
      * Marks task located at index completed
      */
     public void complete(int index) {
-        if(itemCount < index || index <= 0) {
+        if (itemCount < index || index <= 0) {
             System.out.println("\tNo such task found\n");
             return;
         }
         items[index - 1].complete();
         saveTasks();
-        System.out.println("\t_________________________________________\n" +
-                "\tTask marked as done:\n\t" +
-                items[index - 1].toString() +
-                "\n\t_________________________________________\n");
+        System.out.println("\t_________________________________________\n"
+                + "\tTask marked as done:\n\t"
+                + items[index - 1].toString()
+                + "\n\t_________________________________________\n");
 
     }
 
@@ -115,16 +115,16 @@ public class InputList {
      * Unmarks task located at index completed
      */
     public void uncomplete(int index) {
-        if(itemCount < index || index <= 0) {
+        if (itemCount < index || index <= 0) {
             System.out.println("\tNo such task found\n");
             return;
         }
         items[index - 1].uncomplete();
         saveTasks();
-        System.out.println("\t_________________________________________\n" +
-                "\tTask unmarked as done:\n\t" +
-                items[index - 1].toString() +
-                "\n\t_________________________________________\n");
+        System.out.println("\t_________________________________________\n"
+                + "\tTask unmarked as done:\n\t"
+                + items[index - 1].toString()
+                + "\n\t_________________________________________\n");
     }
 
     /**

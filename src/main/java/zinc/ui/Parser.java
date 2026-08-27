@@ -80,7 +80,7 @@ public class Parser {
             addDeadline(parameters);
         } else if (command.equals("event")) {
             addEvent(parameters);
-        } else if(command.equals("delete")) {
+        } else if (command.equals("delete")) {
             deleteTask(parameters);
         } else if (command.equals("help")) {
             ui.printHelp();
