@@ -1,4 +1,10 @@
+package zinc;
+
 import java.util.Scanner;
+
+import zinc.task.InputList;
+import zinc.ui.Parser;
+import zinc.ui.Ui;
 
 public class Zinc {
     /**

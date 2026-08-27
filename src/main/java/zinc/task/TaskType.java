@@ -1,3 +1,5 @@
+package zinc.task;
+
 /**
  * The supported categories of tasks and their list display identifiers.
  */

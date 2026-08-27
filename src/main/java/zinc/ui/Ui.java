@@ -1,3 +1,5 @@
+package zinc.ui;
+
 import java.util.List;
 
 /**

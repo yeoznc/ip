@@ -1,9 +1,16 @@
+package zinc.ui;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.stream.Stream;
+
+import zinc.task.Deadline;
+import zinc.task.Event;
+import zinc.task.InputList;
+import zinc.task.Todo;
 
 /**
  * Interprets user commands and applies them to a list of tasks.
