@@ -18,7 +18,8 @@ import zinc.task.Todo;
 public class Parser {
     /** Accepts a date with an optional 24-hour time, such as 31/08/26 1800. */
     private static final DateTimeFormatter DATE_TIME_FORMAT =
-            DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
+            DateTimeFormatter.ofPattern("dd/MM/uu HHmm")
+                    .withResolverStyle(ResolverStyle.STRICT);
 
     /** Accepts the calendar date used to filter deadlines and events. */
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/uu")
