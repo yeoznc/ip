@@ -114,7 +114,7 @@ public class InputListTest {
     }
 
     @Test
-    public void delete_testCase1_success() {
+    public void delete_notLastAddedTask_success() {
         InputList inputList = new InputList();
         inputList.addTask(new Todo("First"));
         inputList.addTask(new Todo("Second"));
@@ -126,7 +126,7 @@ public class InputListTest {
     }
 
     @Test
-    public void delete_testCase2_success() {
+    public void delete_lastAddedTask_success() {
         InputList inputList = new InputList();
         inputList.addTask(new Todo("First"));
         inputList.addTask(new Todo("Second"));
