@@ -84,6 +84,23 @@ public class InputList {
         System.out.println("\t_________________________________________\n");
     }
 
+    /**
+     * Prints tasks whose descriptions contain the supplied keyword.
+     *
+     * @param keyword the exact, case-sensitive text to search for
+     */
+    public void printTasksContaining(String keyword) {
+        System.out.println("\t_________________________________________\n"
+                + "\tHere are your tasks containing \"" + keyword + "\":\n");
+        for (int i = 0; i < itemCount; i++) {
+            if (items[i].taskName.contains(keyword)) {
+                System.out.println("\t" + (i + 1) + ". "
+                        + items[i].getTaskType().getDisplayIdentifier() + items[i]);
+            }
+        }
+        System.out.println("\t_________________________________________\n");
+    }
+
     /** Returns whether a deadline or event ends on the specified date. */
     private boolean endsOn(Task task, LocalDate date) {
         if (task instanceof Deadline) {

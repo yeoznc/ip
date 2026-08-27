@@ -71,6 +71,8 @@ public class Parser {
             inputs.printItems();
         } else if (command.equals("list")) {
             listTasksEndingOn(parameters);
+        } else if (command.equals("find")) {
+            findTasks(parameters);
         } else if (command.equals("mark")) {
             markTask(parameters);
         } else if (command.equals("unmark")) {
@@ -154,6 +156,15 @@ public class Parser {
         } catch (DateTimeParseException exception) {
             System.out.println("\tDate must use DD/MM/YY. Usage: list <DD/MM/YY>\n");
         }
+    }
+
+    /** Finds tasks whose descriptions contain the supplied keyword. */
+    private void findTasks(String keyword) {
+        if (keyword.isBlank()) {
+            System.out.println("\tUsage: find <keyword>\n");
+            return;
+        }
+        inputs.printTasksContaining(keyword);
     }
 
     /** Marks the task at the supplied user-facing task number as complete. */

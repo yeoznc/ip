@@ -129,4 +129,28 @@ public class ParserTest {
 
         assertEquals(0, inputList.getItemCount());
     }
+
+    @Test
+    public void parse_find_searchesTaskDescriptions() {
+        InputList inputList = new InputList();
+        Parser parser = new Parser(inputList);
+        parser.parse("todo Buy bread");
+        parser.parse("todo Read book");
+
+        parser.parse("find bread");
+
+        assertEquals("Buy bread", inputList.getTasks()[0].taskName);
+        assertEquals("Read book", inputList.getTasks()[1].taskName);
+    }
+
+    @Test
+    public void parse_findWithoutKeyword_doesNotChangeList() {
+        InputList inputList = new InputList();
+        Parser parser = new Parser(inputList);
+        parser.parse("todo Buy bread");
+
+        parser.parse("find");
+
+        assertEquals(1, inputList.getItemCount());
+    }
 }
