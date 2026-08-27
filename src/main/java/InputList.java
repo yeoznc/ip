@@ -1,9 +1,15 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Stores up to 100 user inputs and prints them as a numbered list.
  */
 public class InputList {
     /** The maximum number of inputs that can be stored. */
     private static final int MAX_INPUTS = 100;
+
+    /** The format used when displaying a date supplied to the list command. */
+    private static final DateTimeFormatter DISPLAY_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
 
     /** The stored user inputs. */
     private final Task[] items = new Task[MAX_INPUTS];
@@ -55,6 +61,35 @@ public class InputList {
                     + items[i].toString());
         }
         System.out.println("\t_________________________________________\n");
+    }
+
+    /**
+     * Prints deadlines due, and events ending, on the specified calendar date.
+     * Todo tasks are excluded because they do not have an end date.
+     *
+     * @param date the date on which matching tasks end
+     */
+    public void printTasksEndingOn(LocalDate date) {
+        System.out.println("\t_________________________________________\n" +
+                "\tHere are your tasks ending on " + date.format(DISPLAY_DATE_FORMAT) + ":\n");
+        for (int i = 0; i < itemCount; i++) {
+            if (endsOn(items[i], date)) {
+                System.out.println("\t" + (i + 1) + ". "
+                        + items[i].getTaskType().getDisplayIdentifier() + items[i]);
+            }
+        }
+        System.out.println("\t_________________________________________\n");
+    }
+
+    /** Returns whether a deadline or event ends on the specified date. */
+    private boolean endsOn(Task task, LocalDate date) {
+        if (task instanceof Deadline) {
+            return ((Deadline) task).deadline.toLocalDate().equals(date);
+        }
+        if (task instanceof Event) {
+            return ((Event) task).end.toLocalDate().equals(date);
+        }
+        return false;
     }
 
     /**
