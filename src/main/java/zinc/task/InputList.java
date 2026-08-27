@@ -54,7 +54,7 @@ public class InputList {
     }
 
     /**
-     * Prints every stored input with its list number.
+     * Prints every stored task with its list number.
      */
     public void printItems() {
         System.out.println("\t_________________________________________\n"
@@ -96,7 +96,9 @@ public class InputList {
     }
 
     /**
-     * Marks task located at index completed
+     * Changes task to a completed state
+     *
+     * @param index the index of the task in the 1-indexed list
      */
     public void complete(int index) {
         if (itemCount < index || index <= 0) {
@@ -113,7 +115,9 @@ public class InputList {
     }
 
     /**
-     * Unmarks task located at index completed
+     * Changes task to a uncompleted state
+     *
+     * @param index the index of the task in the 1-indexed list
      */
     public void uncomplete(int index) {
         if (itemCount < index || index <= 0) {
@@ -158,12 +162,18 @@ public class InputList {
                 + "\t_________________________________________\n");
     }
 
-    /** Getter for tasks */
+    /** Getter for the list of tasks stored
+     *
+     * @return Stored list of tasks
+     */
     public Task[] getTasks() {
         return items;
     }
 
-    /** Getter for itemCount */
+    /** Getter for the number of tasks stored
+     *
+     * @return The number of items currently in the stored list
+     */
     public int getItemCount() {
         return itemCount;
     }

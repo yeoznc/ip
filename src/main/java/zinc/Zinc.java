@@ -10,7 +10,7 @@ import zinc.ui.Ui;
 public class Zinc {
     /**
      * Starts Zinc and handles terminal input until the user enters {@code bye}.
-     * Enter {@code list} to display all previously stored inputs.
+     * Enter {@code list} to display all previously stored tasks.
      *
      * @param args command-line arguments, which are not used
      */

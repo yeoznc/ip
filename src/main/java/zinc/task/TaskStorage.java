@@ -18,6 +18,7 @@ public class TaskStorage {
      * Returns the tasks currently saved in the storage file.
      * If any line has an invalid layout, the storage file is cleared and no
      * tasks are loaded. This avoids restoring only part of a damaged list.
+     * When an I/O error occurs, the storage file is also reset.
      *
      * @return all valid saved tasks, in their stored order
      */
@@ -37,6 +38,7 @@ public class TaskStorage {
             tasks.clear();
         } catch (IOException exception) {
             System.out.println("Unable to load saved tasks. Starting with an empty list.\n");
+            resetStorage();
         }
         return tasks;
     }
@@ -62,8 +64,10 @@ public class TaskStorage {
     }
 
     /**
-     * Converts one correctly formatted saved line into its corresponding task.
+     * Converts one correctly formatted storage line into its corresponding task.
      *
+     * @param line the serialized task line read from the storage file
+     * @return the task represented by {@code line}
      * @throws IllegalArgumentException if the line does not match the storage layout
      */
     private Task parseTask(String line) {
