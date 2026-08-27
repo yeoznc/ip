@@ -3,6 +3,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.stream.Stream;
 
 /**
  * Interprets user commands and applies them to a list of tasks.
@@ -22,13 +23,27 @@ public class Parser {
     /** The task list affected by recognised commands. */
     private final InputList inputs;
 
+    /** The UI used to display user-facing messages. */
+    private final Ui ui;
+
     /**
      * Creates a parser that updates the given task list.
      *
      * @param inputs the task list to update
      */
     public Parser(InputList inputs) {
+        this(inputs, new Ui());
+    }
+
+    /**
+     * Creates a parser that updates the given task list using the given UI.
+     *
+     * @param inputs the task list to update
+     * @param ui the UI used to display user-facing messages
+     */
+    public Parser(InputList inputs, Ui ui) {
         this.inputs = inputs;
+        this.ui = ui;
     }
 
     /**
@@ -61,31 +76,16 @@ public class Parser {
         } else if(command.equals("delete")) {
             deleteTask(parameters);
         } else if (command.equals("help")) {
-            System.out.println("\tAvailable commands:\n" +
-                    "\tmark\n" +
-                    "\t\tMarks task as done\n" +
-                    "\t\tUsage: mark <task number>\n" +
-                    "\tunmark\n" +
-                    "\t\tMarks task as undone\n" +
-                    "\t\tUsage: unmark <task number>\n" +
-                    "\tlist\n" +
-                    "\t\tLists all added tasks\n" +
-                    "\t\tUsage: list\n" +
-                    "\t\tUsage: list <DD/MM/YY> to list deadlines and events ending that day\n" +
-                    "\ttodo\n" +
-                    "\t\tAdds a ToDo task\n" +
-                    "\t\tUsage: todo <description>\n" +
-                    "\tdeadline\n" +
-                    "\t\tAdds a Deadline task\n" +
-                    "\t\tUsage: deadline <description> /by <" + DATE_TIME_USAGE + ">\n" +
-                    "\tevent\n" +
-                    "\t\tAdds an Event task\n" +
-                    "\t\tUsage: event <description> /from <" + DATE_TIME_USAGE + "> /to <"
-                            + DATE_TIME_USAGE + ">\n" +
-                    "\tbye\n" +
-                    "\t\tExits\n");
+            ui.printHelp();
         } else {
-            System.out.println("\tSorry, I don't know what you mean. Type help for a list of available commands\n");
+            Stream<String> autoComplete = ui.getCommands().stream().filter(x -> x.startsWith(command));
+            String otherCommands = autoComplete.reduce("", (x, y) -> x + y + " ");
+            if (otherCommands.isEmpty()) {
+                System.out.println("\tSorry, I don't know what you mean. Type help for a list of available commands\n");
+            } else {
+                System.out.println("\tDid you mean: " + otherCommands);
+                System.out.println("\tType help for a list of available commands");
+            }
         }
         return false;
     }
