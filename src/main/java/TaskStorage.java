@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,11 +78,11 @@ public class TaskStorage {
                 break;
             case "D":
                 requireFieldCount(parts, 4);
-                task = new Deadline(parts[2], parts[3]);
+                task = new Deadline(parts[2], LocalDateTime.parse(parts[3]));
                 break;
             case "E":
                 requireFieldCount(parts, 5);
-                task = new Event(parts[2], parts[3], parts[4]);
+                task = new Event(parts[2], LocalDateTime.parse(parts[3]), LocalDateTime.parse(parts[4]));
                 break;
             default:
                 throw new IllegalArgumentException("Unknown task type");
@@ -113,7 +114,7 @@ public class TaskStorage {
         }
     }
 
-    /** Converts a task into the stable, line-based storage format. */
+    /** Converts a task into the pre-determined storage format. */
     private String formatTask(Task task) {
         String status = task.isCompleted() ? "1" : "0";
         switch (task.getTaskType()) {
