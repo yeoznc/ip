@@ -87,10 +87,10 @@ public class InputList {
     /** Returns whether a deadline or event ends on the specified date. */
     private boolean endsOn(Task task, LocalDate date) {
         if (task instanceof Deadline) {
-            return ((Deadline) task).deadline.toLocalDate().equals(date);
+            return ((Deadline) task).getDeadline().toLocalDate().equals(date);
         }
         if (task instanceof Event) {
-            return ((Event) task).end.toLocalDate().equals(date);
+            return ((Event) task).getEnd().toLocalDate().equals(date);
         }
         return false;
     }
@@ -162,17 +162,19 @@ public class InputList {
                 + "\t_________________________________________\n");
     }
 
-    /** Getter for the list of tasks stored
+    /**
+     * Returns the list of tasks stored.
      *
-     * @return Stored list of tasks
+     * @return the stored task list
      */
     public Task[] getTasks() {
         return items;
     }
 
-    /** Getter for the number of tasks stored
+    /**
+     * Returns the number of tasks stored.
      *
-     * @return The number of items currently in the stored list
+     * @return the number of items currently in the stored list
      */
     public int getItemCount() {
         return itemCount;

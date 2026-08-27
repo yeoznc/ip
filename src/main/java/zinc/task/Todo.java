@@ -16,6 +16,7 @@ public class Todo extends Task {
      *
      * @return the todo task type
      */
+    @Override
     public TaskType getTaskType() {
         return TaskType.TODO;
     }

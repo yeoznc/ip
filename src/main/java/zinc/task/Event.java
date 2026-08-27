@@ -10,9 +10,9 @@ public class Event extends Task {
     private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMAT =
             DateTimeFormatter.ofPattern("MMM dd uuuu HH:mm", Locale.ENGLISH);
     /** The date and time at which the event starts. */
-    public final LocalDateTime start;
+    private final LocalDateTime start;
     /** The date and time at which the event ends. */
-    public final LocalDateTime end;
+    private final LocalDateTime end;
 
     /**
      * Creates an event task.
@@ -32,6 +32,7 @@ public class Event extends Task {
      *
      * @return the event task type
      */
+    @Override
     public TaskType getTaskType() {
         return TaskType.EVENT;
     }
@@ -41,9 +42,20 @@ public class Event extends Task {
      *
      * @return the task name, completion status, and event interval
      */
+    @Override
     public String toString() {
         return super.toString() + " (from: "
                 + start.format(DISPLAY_DATE_TIME_FORMAT).toUpperCase(Locale.ENGLISH)
                 + " to: " + end.format(DISPLAY_DATE_TIME_FORMAT).toUpperCase(Locale.ENGLISH) + ")";
+    }
+
+    /** Returns the date and time at which the event starts. */
+    public LocalDateTime getStart() {
+        return start;
+    }
+
+    /** Returns the date and time at which the event ends. */
+    public LocalDateTime getEnd() {
+        return end;
     }
 }

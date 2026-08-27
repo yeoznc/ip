@@ -10,7 +10,7 @@ public class Deadline extends Task {
     private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMAT =
             DateTimeFormatter.ofPattern("MMM dd uuuu HH:mm", Locale.ENGLISH);
     /** The date and time by which this task must be completed. */
-    public final LocalDateTime deadline;
+    private final LocalDateTime deadline;
 
     /**
      * Creates a deadline task.
@@ -28,6 +28,7 @@ public class Deadline extends Task {
      *
      * @return the deadline task type
      */
+    @Override
     public TaskType getTaskType() {
         return TaskType.DEADLINE;
     }
@@ -37,8 +38,14 @@ public class Deadline extends Task {
      *
      * @return the task name, completion status, and deadline
      */
+    @Override
     public String toString() {
         return super.toString() + " (by: "
                 + deadline.format(DISPLAY_DATE_TIME_FORMAT).toUpperCase(Locale.ENGLISH) + ")";
+    }
+
+    /** Returns the date and time by which this task must be completed. */
+    public LocalDateTime getDeadline() {
+        return deadline;
     }
 }
