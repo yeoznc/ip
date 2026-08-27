@@ -48,7 +48,7 @@ public class ParserTest {
 
         parser.parse("todo Buy bread");
 
-        assertEquals("Buy bread", inputList.getTasks()[0].taskName);
+        assertEquals("Buy bread", inputList.getTasks()[0].getTaskName());
         assertTrue(inputList.getTasks()[0] instanceof Todo);
     }
 
@@ -70,7 +70,7 @@ public class ParserTest {
         parser.parse("deadline Submit report /by 27/08/26");
 
         Deadline deadline = (Deadline) inputList.getTasks()[0];
-        assertEquals(LocalDateTime.of(2026, 8, 27, 0, 0), deadline.deadline);
+        assertEquals(LocalDateTime.of(2026, 8, 27, 0, 0), deadline.getDeadline());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class ParserTest {
         parser.parse("deadline Submit report /by 27/08/26 1830");
 
         Deadline deadline = (Deadline) inputList.getTasks()[0];
-        assertEquals(LocalDateTime.of(2026, 8, 27, 18, 30), deadline.deadline);
+        assertEquals(LocalDateTime.of(2026, 8, 27, 18, 30), deadline.getDeadline());
     }
 
     @Test
@@ -102,8 +102,8 @@ public class ParserTest {
         parser.parse("event Meeting /from 27/08/26 1000 /to 27/08/26 1100");
 
         Event event = (Event) inputList.getTasks()[0];
-        assertEquals(LocalDateTime.of(2026, 8, 27, 10, 0), event.start);
-        assertEquals(LocalDateTime.of(2026, 8, 27, 11, 0), event.end);
+        assertEquals(LocalDateTime.of(2026, 8, 27, 10, 0), event.getStart());
+        assertEquals(LocalDateTime.of(2026, 8, 27, 11, 0), event.getEnd());
     }
 
     @Test

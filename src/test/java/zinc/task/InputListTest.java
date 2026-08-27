@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/** Tests adding, completing, and deleting tasks in an input list. */
 public class InputListTest {
     private static final Path STORAGE_FILE = Path.of("data", "zinc.txt");
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd")
@@ -121,7 +122,7 @@ public class InputListTest {
 
         inputList.delete(1);
 
-        assertEquals("Second", inputList.getTasks()[0].taskName);
+        assertEquals("Second", inputList.getTasks()[0].getTaskName());
         assertEquals(null, inputList.getTasks()[1]);
     }
 
@@ -133,7 +134,7 @@ public class InputListTest {
 
         inputList.delete(2);
 
-        assertEquals("First", inputList.getTasks()[0].taskName);
+        assertEquals("First", inputList.getTasks()[0].getTaskName());
         assertEquals(null, inputList.getTasks()[1]);
     }
 
@@ -147,6 +148,6 @@ public class InputListTest {
 
         inputList.printTasksEndingOn(LocalDate.of(2026, 8, 27));
 
-        assertEquals("Submit report", inputList.getTasks()[0].taskName);
+        assertEquals("Submit report", inputList.getTasks()[0].getTaskName());
     }
 }

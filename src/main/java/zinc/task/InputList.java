@@ -54,7 +54,7 @@ public class InputList {
     }
 
     /**
-     * Prints every stored input with its list number.
+     * Prints every stored task with its list number.
      */
     public void printItems() {
         System.out.println("\t_________________________________________\n"
@@ -87,16 +87,18 @@ public class InputList {
     /** Returns whether a deadline or event ends on the specified date. */
     private boolean endsOn(Task task, LocalDate date) {
         if (task instanceof Deadline) {
-            return ((Deadline) task).deadline.toLocalDate().equals(date);
+            return ((Deadline) task).getDeadline().toLocalDate().equals(date);
         }
         if (task instanceof Event) {
-            return ((Event) task).end.toLocalDate().equals(date);
+            return ((Event) task).getEnd().toLocalDate().equals(date);
         }
         return false;
     }
 
     /**
-     * Marks task located at index completed
+     * Changes task to a completed state
+     *
+     * @param index the index of the task in the 1-indexed list
      */
     public void complete(int index) {
         if (itemCount < index || index <= 0) {
@@ -113,7 +115,9 @@ public class InputList {
     }
 
     /**
-     * Unmarks task located at index completed
+     * Changes task to a uncompleted state
+     *
+     * @param index the index of the task in the 1-indexed list
      */
     public void uncomplete(int index) {
         if (itemCount < index || index <= 0) {
@@ -158,12 +162,20 @@ public class InputList {
                 + "\t_________________________________________\n");
     }
 
-    /** Getter for tasks */
+    /**
+     * Returns the list of tasks stored.
+     *
+     * @return the stored task list
+     */
     public Task[] getTasks() {
         return items;
     }
 
-    /** Getter for itemCount */
+    /**
+     * Returns the number of tasks stored.
+     *
+     * @return the number of items currently in the stored list
+     */
     public int getItemCount() {
         return itemCount;
     }

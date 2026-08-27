@@ -2,10 +2,10 @@ package zinc.task;
 
 /**
  * Represents a task with a description and completion status.
- *
  */
 public abstract class Task {
-    public final String taskName;
+    /** The description of this task. */
+    private final String taskName;
     private boolean completed;
 
     /**
@@ -19,14 +19,14 @@ public abstract class Task {
     }
 
     /**
-     * Completes the task
+     * Completes the task.
      */
     void complete() {
         this.completed = true;
     }
 
     /**
-     * Uncompletes the task
+     * Marks the task as incomplete.
      */
     void uncomplete() {
         this.completed = false;
@@ -39,6 +39,11 @@ public abstract class Task {
      */
     boolean isCompleted() {
         return this.completed;
+    }
+
+    /** Returns the task description. */
+    public String getTaskName() {
+        return taskName;
     }
 
     /**

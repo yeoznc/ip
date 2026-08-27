@@ -46,10 +46,11 @@ public class TaskStorageTest {
 
         assertEquals(3, loadedTasks.size());
         assertTrue(loadedTasks.get(0) instanceof Todo);
-        assertEquals("Buy bread", loadedTasks.get(0).taskName);
+        assertEquals("Buy bread", loadedTasks.get(0).getTaskName());
         assertTrue(loadedTasks.get(1) instanceof Deadline);
         assertTrue(loadedTasks.get(1).isCompleted());
-        assertEquals(LocalDateTime.of(2026, 8, 27, 18, 30), ((Deadline) loadedTasks.get(1)).deadline);
+        Deadline loadedDeadline = (Deadline) loadedTasks.get(1);
+        assertEquals(LocalDateTime.of(2026, 8, 27, 18, 30), loadedDeadline.getDeadline());
         assertTrue(loadedTasks.get(2) instanceof Event);
     }
 
