@@ -1,3 +1,5 @@
+package zinc.task;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -12,7 +14,7 @@ public class Event extends Task{
     /** The date and time at which the event ends. */
     public final LocalDateTime end;
 
-    Event(String name, LocalDateTime start, LocalDateTime end) {
+    public Event(String name, LocalDateTime start, LocalDateTime end) {
         super(name);
         this.start = start;
         this.end = end;

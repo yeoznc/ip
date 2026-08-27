@@ -1,3 +1,5 @@
+package zinc.task;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -10,7 +12,7 @@ public class Deadline extends Task{
     /** The date and time by which this task must be completed. */
     public final LocalDateTime deadline;
 
-    Deadline(String name, LocalDateTime deadline) {
+    public Deadline(String name, LocalDateTime deadline) {
         super(name);
         this.deadline = deadline;
     }
