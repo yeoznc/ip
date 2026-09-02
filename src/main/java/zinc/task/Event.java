@@ -17,9 +17,9 @@ public class Event extends Task {
     /**
      * Creates an event task.
      *
-     * @param name the description of the event
-     * @param start the date and time when the event starts
-     * @param end the date and time when the event ends
+     * @param name The description of the event.
+     * @param start The date and time when the event starts.
+     * @param end The date and time when the event ends.
      */
     public Event(String name, LocalDateTime start, LocalDateTime end) {
         super(name);
@@ -30,7 +30,7 @@ public class Event extends Task {
     /**
      * Returns the category of this task.
      *
-     * @return the event task type
+     * @return The event task type.
      */
     @Override
     public TaskType getTaskType() {
@@ -40,7 +40,7 @@ public class Event extends Task {
     /**
      * Returns a display-friendly representation including the event times.
      *
-     * @return the task name, completion status, and event interval
+     * @return The task name, completion status, and event interval.
      */
     @Override
     public String toString() {

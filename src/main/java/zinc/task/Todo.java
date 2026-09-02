@@ -5,7 +5,7 @@ public class Todo extends Task {
     /**
      * Creates a todo task.
      *
-     * @param name the description of the task
+     * @param name The description of the task.
      */
     public Todo(String name) {
         super(name);
@@ -14,7 +14,7 @@ public class Todo extends Task {
     /**
      * Returns the category of this task.
      *
-     * @return the todo task type
+     * @return The todo task type.
      */
     @Override
     public TaskType getTaskType() {

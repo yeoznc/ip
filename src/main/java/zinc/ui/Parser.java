@@ -37,7 +37,7 @@ public class Parser {
     /**
      * Creates a parser that updates the given task list.
      *
-     * @param inputs the task list to update
+     * @param inputs The task list to update.
      */
     public Parser(InputList inputs) {
         this(inputs, new Ui());
@@ -46,8 +46,8 @@ public class Parser {
     /**
      * Creates a parser that updates the given task list using the given UI.
      *
-     * @param inputs the task list to update
-     * @param ui the UI used to display user-facing messages
+     * @param inputs The task list to update.
+     * @param ui The UI used to display user-facing messages.
      */
     public Parser(InputList inputs, Ui ui) {
         this.inputs = inputs;
@@ -57,8 +57,8 @@ public class Parser {
     /**
      * Processes one user command.
      *
-     * @param input the complete line entered by the user
-     * @return {@code true} when the user entered {@code bye}; otherwise {@code false}
+     * @param input The complete line entered by the user.
+     * @return {@code true} when the user entered {@code bye}; otherwise, {@code false}.
      */
     public boolean parse(String input) {
         String[] commandParts = input.trim().split(" ", 2);

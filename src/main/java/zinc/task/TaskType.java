@@ -13,7 +13,7 @@ public enum TaskType {
     /**
      * Creates a task type with its display identifier.
      *
-     * @param displayIdentifier the prefix shown before a task in the list
+     * @param displayIdentifier The prefix shown before a task in the list.
      */
     TaskType(String displayIdentifier) {
         this.displayIdentifier = displayIdentifier;
@@ -22,7 +22,7 @@ public enum TaskType {
     /**
      * Returns the prefix displayed before tasks of this type.
      *
-     * @return the display identifier
+     * @return The display identifier.
      */
     public String getDisplayIdentifier() {
         return displayIdentifier;

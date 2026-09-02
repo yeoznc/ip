@@ -15,8 +15,8 @@ public class Deadline extends Task {
     /**
      * Creates a deadline task.
      *
-     * @param name the description of the task
-     * @param deadline the date and time by which the task must be completed
+     * @param name The description of the task.
+     * @param deadline The date and time by which the task must be completed.
      */
     public Deadline(String name, LocalDateTime deadline) {
         super(name);
@@ -26,7 +26,7 @@ public class Deadline extends Task {
     /**
      * Returns the category of this task.
      *
-     * @return the deadline task type
+     * @return The deadline task type.
      */
     @Override
     public TaskType getTaskType() {
@@ -36,7 +36,7 @@ public class Deadline extends Task {
     /**
      * Returns a display-friendly representation including the deadline.
      *
-     * @return the task name, completion status, and deadline
+     * @return The task name, completion status, and deadline.
      */
     @Override
     public String toString() {

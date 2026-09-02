@@ -139,8 +139,8 @@ public class ParserTest {
 
         parser.parse("find bread");
 
-        assertEquals("Buy bread", inputList.getTasks()[0].taskName);
-        assertEquals("Read book", inputList.getTasks()[1].taskName);
+        assertEquals("Buy bread", inputList.getTasks()[0].getTaskName());
+        assertEquals("Read book", inputList.getTasks()[1].getTaskName());
     }
 
     @Test
