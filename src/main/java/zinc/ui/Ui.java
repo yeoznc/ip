@@ -83,7 +83,7 @@ public class Ui {
     /**
      * Returns the supported commands in alphabetical order.
      *
-     * @return an immutable list of command names
+     * @return An immutable list of command names.
      */
     public List<String> getCommands() {
         return commands;

@@ -37,7 +37,7 @@ public class InputList {
     /**
      * Stores a task when there is remaining space in the list.
      *
-     * @param task the task to store
+     * @param task The task to store.
      */
     public void addTask(Task task) {
         if (itemCount < MAX_INPUTS) {
@@ -70,7 +70,7 @@ public class InputList {
      * Prints deadlines due, and events ending, on the specified calendar date.
      * Todo tasks are excluded because they do not have an end date.
      *
-     * @param date the date on which matching tasks end
+     * @param date The date on which matching tasks end.
      */
     public void printTasksEndingOn(LocalDate date) {
         System.out.println("\t_________________________________________\n"
@@ -87,13 +87,13 @@ public class InputList {
     /**
      * Prints tasks whose descriptions contain the supplied keyword.
      *
-     * @param keyword the exact, case-sensitive text to search for
+     * @param keyword The exact, case-sensitive text to search for.
      */
     public void printTasksContaining(String keyword) {
         System.out.println("\t_________________________________________\n"
                 + "\tHere are your tasks containing \"" + keyword + "\":\n");
         for (int i = 0; i < itemCount; i++) {
-            if (items[i].taskName.contains(keyword)) {
+            if (items[i].getTaskName().contains(keyword)) {
                 System.out.println("\t" + (i + 1) + ". "
                         + items[i].getTaskType().getDisplayIdentifier() + items[i]);
             }
@@ -115,7 +115,7 @@ public class InputList {
     /**
      * Changes task to a completed state
      *
-     * @param index the index of the task in the 1-indexed list
+     * @param index The index of the task in the 1-indexed list.
      */
     public void complete(int index) {
         if (itemCount < index || index <= 0) {
@@ -134,7 +134,7 @@ public class InputList {
     /**
      * Changes task to a uncompleted state
      *
-     * @param index the index of the task in the 1-indexed list
+     * @param index The index of the task in the 1-indexed list.
      */
     public void uncomplete(int index) {
         if (itemCount < index || index <= 0) {
@@ -152,7 +152,7 @@ public class InputList {
     /**
      * Deletes the task at the user-facing list number.
      *
-     * @param index the task number shown to the user, starting from 1
+     * @param index The task number shown to the user, starting from 1.
      */
     public void delete(int index) {
         int arrayIndex = index - 1;
@@ -182,7 +182,7 @@ public class InputList {
     /**
      * Returns the list of tasks stored.
      *
-     * @return the stored task list
+     * @return The stored task list.
      */
     public Task[] getTasks() {
         return items;
@@ -191,7 +191,7 @@ public class InputList {
     /**
      * Returns the number of tasks stored.
      *
-     * @return the number of items currently in the stored list
+     * @return The number of items currently in the stored list.
      */
     public int getItemCount() {
         return itemCount;

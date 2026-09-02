@@ -20,7 +20,7 @@ public class TaskStorage {
      * tasks are loaded. This avoids restoring only part of a damaged list.
      * When an I/O error occurs, the storage file is also reset.
      *
-     * @return all valid saved tasks, in their stored order
+     * @return All valid saved tasks, in their stored order.
      */
     public List<Task> loadTasks() {
         List<Task> tasks = new ArrayList<>();
@@ -46,8 +46,8 @@ public class TaskStorage {
     /**
      * Writes every task in the supplied array to the storage file.
      *
-     * @param tasks the task array to save
-     * @param taskCount the number of populated entries in {@code tasks}
+     * @param tasks The task array to save.
+     * @param taskCount The number of populated entries in {@code tasks}.
      */
     public void saveTasks(Task[] tasks, int taskCount) {
         List<String> lines = new ArrayList<>();
@@ -66,9 +66,9 @@ public class TaskStorage {
     /**
      * Converts one correctly formatted storage line into its corresponding task.
      *
-     * @param line the serialized task line read from the storage file
-     * @return the task represented by {@code line}
-     * @throws IllegalArgumentException if the line does not match the storage layout
+     * @param line The serialized task line read from the storage file.
+     * @return The task represented by {@code line}.
+     * @throws IllegalArgumentException If the line does not match the storage layout.
      */
     private Task parseTask(String line) {
         String[] parts = line.split(" \\| ", -1);

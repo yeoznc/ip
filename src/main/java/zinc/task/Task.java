@@ -11,7 +11,7 @@ public abstract class Task {
     /**
      * Creates a new task.
      *
-     * @param name the description of the task
+     * @param name The description of the task.
      */
     Task(String name) {
         this.taskName = name;
@@ -35,7 +35,7 @@ public abstract class Task {
     /**
      * Checks whether this task is complete.
      *
-     * @return {@code true} if the task is complete; otherwise, {@code false}
+     * @return {@code true} if the task is complete; otherwise, {@code false}.
      */
     boolean isCompleted() {
         return this.completed;
@@ -50,7 +50,7 @@ public abstract class Task {
      * Returns a display-friendly representation of this task and its status.
      *
      * @return {@code [X]} followed by the task name when complete, or
-     *         {@code [ ]} followed by the task name when incomplete
+     *         {@code [ ]} followed by the task name when incomplete.
      */
     @Override
     public String toString() {
@@ -64,7 +64,7 @@ public abstract class Task {
     /**
      * Returns this task's category.
      *
-     * @return the type of this task
+     * @return The type of this task.
      */
     public abstract TaskType getTaskType();
 }
