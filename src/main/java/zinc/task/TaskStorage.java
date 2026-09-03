@@ -116,7 +116,7 @@ public class TaskStorage {
         try {
             Files.write(STORAGE_FILE, List.of());
         } catch (IOException exception) {
-            System.out.println("\tUnable to clear the invalid saved task file.\n");
+            System.out.println("Unable to clear the invalid saved task file.\n");
         }
     }
 

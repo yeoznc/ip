@@ -46,24 +46,24 @@ public class InputList {
             saveTasks();
         }
 
-        System.out.println("\t_________________________________________\n"
-                + "\tTask added to list:\n\t"
+        System.out.println("_________________________________________\n"
+                + "Task added to list:\n"
                 + task.getTaskType().getDisplayIdentifier() + task.toString() + "\n"
-                + "\tYou have " + itemCount + " tasks in the list\n"
-                + "\t_________________________________________\n");
+                + "You have " + itemCount + " tasks in the list\n"
+                + "_________________________________________\n");
     }
 
     /**
      * Prints every stored task with its list number.
      */
     public void printItems() {
-        System.out.println("\t_________________________________________\n"
-                + "\tHere are your current tasks:\n");
+        System.out.println("_________________________________________\n"
+                + "Here are your current tasks:\n");
         for (int i = 0; i < itemCount; i++) {
-            System.out.println("\t" + (i + 1) + ". " + items[i].getTaskType().getDisplayIdentifier()
+            System.out.println((i + 1) + ". " + items[i].getTaskType().getDisplayIdentifier()
                     + items[i].toString());
         }
-        System.out.println("\t_________________________________________\n");
+        System.out.println("_________________________________________\n");
     }
 
     /**
@@ -73,15 +73,15 @@ public class InputList {
      * @param date The date on which matching tasks end.
      */
     public void printTasksEndingOn(LocalDate date) {
-        System.out.println("\t_________________________________________\n"
-                + "\tHere are your tasks ending on " + date.format(DISPLAY_DATE_FORMAT) + ":\n");
+        System.out.println("_________________________________________\n"
+                + "Here are your tasks ending on " + date.format(DISPLAY_DATE_FORMAT) + ":\n");
         for (int i = 0; i < itemCount; i++) {
             if (endsOn(items[i], date)) {
-                System.out.println("\t" + (i + 1) + ". "
+                System.out.println((i + 1) + ". "
                         + items[i].getTaskType().getDisplayIdentifier() + items[i]);
             }
         }
-        System.out.println("\t_________________________________________\n");
+        System.out.println("_________________________________________\n");
     }
 
     /**
@@ -90,15 +90,15 @@ public class InputList {
      * @param keyword The exact, case-sensitive text to search for.
      */
     public void printTasksContaining(String keyword) {
-        System.out.println("\t_________________________________________\n"
-                + "\tHere are your tasks containing \"" + keyword + "\":\n");
+        System.out.println("_________________________________________\n"
+                + "Here are your tasks containing \"" + keyword + "\":\n");
         for (int i = 0; i < itemCount; i++) {
             if (items[i].getTaskName().contains(keyword)) {
-                System.out.println("\t" + (i + 1) + ". "
+                System.out.println((i + 1) + ". "
                         + items[i].getTaskType().getDisplayIdentifier() + items[i]);
             }
         }
-        System.out.println("\t_________________________________________\n");
+        System.out.println("_________________________________________\n");
     }
 
     /** Returns whether a deadline or event ends on the specified date. */
@@ -119,15 +119,15 @@ public class InputList {
      */
     public void complete(int index) {
         if (itemCount < index || index <= 0) {
-            System.out.println("\tNo such task found\n");
+            System.out.println("No such task found\n");
             return;
         }
         items[index - 1].complete();
         saveTasks();
-        System.out.println("\t_________________________________________\n"
-                + "\tTask marked as done:\n\t"
+        System.out.println("_________________________________________\n"
+                + "Task marked as done:\n"
                 + items[index - 1].toString()
-                + "\n\t_________________________________________\n");
+                + "\n_________________________________________\n");
 
     }
 
@@ -138,15 +138,15 @@ public class InputList {
      */
     public void uncomplete(int index) {
         if (itemCount < index || index <= 0) {
-            System.out.println("\tNo such task found\n");
+            System.out.println("No such task found\n");
             return;
         }
         items[index - 1].uncomplete();
         saveTasks();
-        System.out.println("\t_________________________________________\n"
-                + "\tTask unmarked as done:\n\t"
+        System.out.println("_________________________________________\n"
+                + "Task unmarked as done:\n"
                 + items[index - 1].toString()
-                + "\n\t_________________________________________\n");
+                + "\n_________________________________________\n");
     }
 
     /**
@@ -158,7 +158,7 @@ public class InputList {
         int arrayIndex = index - 1;
 
         if (arrayIndex < 0 || arrayIndex >= itemCount) {
-            System.out.println("\tNo such task found\n");
+            System.out.println("No such task found\n");
             return;
         }
 
@@ -172,11 +172,11 @@ public class InputList {
         items[itemCount] = null;
         saveTasks();
 
-        System.out.println("\t_________________________________________\n"
-                + "\tTask deleted:\n\t"
+        System.out.println("_________________________________________\n"
+                + "Task deleted:\n"
                 + deletedTask.getTaskType().getDisplayIdentifier() + deletedTask + "\n"
-                + "\tYou have " + itemCount + " tasks in the list\n"
-                + "\t_________________________________________\n");
+                + "You have " + itemCount + " tasks in the list\n"
+                + "_________________________________________\n");
     }
 
     /**
