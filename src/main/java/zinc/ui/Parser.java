@@ -67,7 +67,7 @@ public class Parser {
 
         if (command.equals("bye") && parameters.isEmpty()) {
             return true;
-        } else if (command.equals("list") && parameters.isEmpty()) {
+        } else if ((command.equals("list") || command.equals("ls")) && parameters.isEmpty()) {
             inputs.printItems();
         } else if (command.equals("list")) {
             listTasksEndingOn(parameters);
