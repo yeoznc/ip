@@ -67,7 +67,7 @@ public class Parser {
 
         if (command.equals("bye") && parameters.isEmpty()) {
             return true;
-        } else if ((command.equals("list") || command.equals("ls")) && parameters.isEmpty()) {
+        } else if (isCommand(command, "list", "ls") && parameters.isEmpty()) {
             inputs.printItems();
         } else if (command.equals("list")) {
             listTasksEndingOn(parameters);
@@ -91,10 +91,10 @@ public class Parser {
             Stream<String> autoComplete = ui.getCommands().stream().filter(x -> x.startsWith(command));
             String otherCommands = autoComplete.reduce("", (x, y) -> x + y + " ");
             if (otherCommands.isEmpty()) {
-                System.out.println("\tSorry, I don't know what you mean. Type help for a list of available commands\n");
+                System.out.println("Sorry, I don't know what you mean. Type help for a list of available commands\n");
             } else {
-                System.out.println("\tDid you mean: " + otherCommands);
-                System.out.println("\tType help for a list of available commands");
+                System.out.println("Did you mean: " + otherCommands);
+                System.out.println("Type help for a list of available commands");
             }
         }
         return false;
@@ -103,7 +103,7 @@ public class Parser {
     /** Adds a todo when it has a description. */
     private void addTodo(String description) {
         if (description.isEmpty()) {
-            System.out.println("\tThe description of a todo cannot be empty.\n");
+            System.out.println("The description of a todo cannot be empty.\n");
             return;
         }
         inputs.addTask(new Todo(description));
@@ -113,13 +113,13 @@ public class Parser {
     private void addDeadline(String parameters) {
         String[] deadlineParts = parameters.split(" /by ", 2);
         if (deadlineParts.length != 2 || deadlineParts[0].isBlank() || deadlineParts[1].isBlank()) {
-            System.out.println("\tUsage: deadline <description> /by <" + DATE_TIME_USAGE + ">\n");
+            System.out.println("Usage: deadline <description> /by <" + DATE_TIME_USAGE + ">\n");
             return;
         }
         try {
             inputs.addTask(new Deadline(deadlineParts[0].trim(), parseDateTime(deadlineParts[1])));
         } catch (DateTimeParseException exception) {
-            System.out.println("\tDate and time must use " + DATE_TIME_USAGE + ".\n");
+            System.out.println("Date and time must use " + DATE_TIME_USAGE + ".\n");
         }
     }
 
@@ -128,7 +128,7 @@ public class Parser {
         String[] eventParts = parameters.split(" /from | /to ", 3);
         if (eventParts.length != 3 || eventParts[0].isBlank()
                 || eventParts[1].isBlank() || eventParts[2].isBlank()) {
-            System.out.println("\tUsage: event <description> /from <" + DATE_TIME_USAGE + "> /to <"
+            System.out.println("Usage: event <description> /from <" + DATE_TIME_USAGE + "> /to <"
                     + DATE_TIME_USAGE + ">\n");
             return;
         }
@@ -136,7 +136,7 @@ public class Parser {
             inputs.addTask(new Event(eventParts[0].trim(), parseDateTime(eventParts[1]),
                     parseDateTime(eventParts[2])));
         } catch (DateTimeParseException exception) {
-            System.out.println("\tDate and time must use " + DATE_TIME_USAGE + ".\n");
+            System.out.println("Date and time must use " + DATE_TIME_USAGE + ".\n");
         }
     }
 
@@ -154,14 +154,14 @@ public class Parser {
         try {
             inputs.printTasksEndingOn(LocalDate.parse(parameters, DATE_FORMAT));
         } catch (DateTimeParseException exception) {
-            System.out.println("\tDate must use DD/MM/YY. Usage: list <DD/MM/YY>\n");
+            System.out.println("Date must use DD/MM/YY. Usage: list <DD/MM/YY>\n");
         }
     }
 
     /** Finds tasks whose descriptions contain the supplied keyword. */
     private void findTasks(String keyword) {
         if (keyword.isBlank()) {
-            System.out.println("\tUsage: find <keyword>\n");
+            System.out.println("Usage: find <keyword>\n");
             return;
         }
         inputs.printTasksContaining(keyword);
@@ -172,7 +172,7 @@ public class Parser {
         try {
             inputs.complete(Integer.parseInt(parameters));
         } catch (NumberFormatException exception) {
-            System.out.println("\tTask number must be an integer. Usage: mark <task number>\n");
+            System.out.println("Task number must be an integer. Usage: mark <task number>\n");
         }
     }
 
@@ -181,7 +181,7 @@ public class Parser {
         try {
             inputs.uncomplete(Integer.parseInt(parameters));
         } catch (NumberFormatException exception) {
-            System.out.println("\tTask number must be an integer. Usage: unmark <task number>\n");
+            System.out.println("Task number must be an integer. Usage: unmark <task number>\n");
         }
     }
 
@@ -190,7 +190,23 @@ public class Parser {
         try {
             inputs.delete(Integer.parseInt(parameters));
         } catch (NumberFormatException exception) {
-            System.out.println("\tTask number must be an integer. Usage: delete <task number>\n");
+            System.out.println("Task number must be an integer. Usage: delete <task number>\n");
         }
+    }
+
+    /**
+     * Tries to identify if the user input is equivalent to a valid command or its alias.
+     *
+     * @param command User input.
+     * @param names Possible corresponding commands.
+     * @return True if user input is equivalent to one of the commands in the second parameter. False otherwise.
+     */
+    private boolean isCommand(String command, String... names) {
+        for (String name : names) {
+            if (command.equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
