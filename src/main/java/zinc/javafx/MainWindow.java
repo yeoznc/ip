@@ -82,6 +82,14 @@ public class MainWindow extends AnchorPane {
     }
 
     @FXML
+    private void printContacts() {
+        String response = zinc.getResponse("ct ls");
+        dialogContainer.getChildren().addAll(
+                DialogBox.getZincDialog(response, zincImage)
+        );
+    }
+
+    @FXML
     private void startNewConversation() {
         dialogContainer.getChildren().clear();
         dialogContainer.getChildren().add(DialogBox.getZincDialog(

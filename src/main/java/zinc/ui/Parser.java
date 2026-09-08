@@ -1,39 +1,21 @@
 package zinc.ui;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
-import java.util.HashMap;
-import java.util.Map;
-
-import zinc.task.Deadline;
-import zinc.task.Event;
+import zinc.contact.ContactCommandHandler;
 import zinc.task.InputList;
-import zinc.task.Todo;
+import zinc.task.TaskCommandHandler;
 
 /**
- * Interprets user commands and applies them to a list of tasks.
+ * Interprets top-level user commands and delegates domain operations.
  */
 public class Parser {
-    /** Accepts a date with an optional 24-hour time, such as 31/08/26 1800. */
-    private static final DateTimeFormatter DATE_TIME_FORMAT =
-            DateTimeFormatter.ofPattern("dd/MM/uu HHmm")
-                    .withResolverStyle(ResolverStyle.STRICT);
+    /** The handler for commands that operate on tasks. */
+    private final TaskCommandHandler taskCommandHandler;
 
-    /** Accepts the calendar date used to filter deadlines and events. */
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/uu")
-            .withResolverStyle(ResolverStyle.STRICT);
+    /** The handler for commands that operate on contacts. */
+    private final ContactCommandHandler contactCommandHandler;
 
-    /** The task list affected by recognised commands. */
-    private final InputList inputs;
-
-    /** The UI used to display user-facing messages. */
+    /** The UI used to display general command messages. */
     private final Ui ui;
-
-    /** Commands indexed by their user-facing names. */
-    private final Map<String, Command> commands;
 
     /**
      * Creates a parser that updates the given task list.
@@ -41,7 +23,7 @@ public class Parser {
      * @param inputs The task list to update.
      */
     public Parser(InputList inputs) {
-        this(inputs, new Ui());
+        this(inputs, new zinc.contact.InputList(), new Ui());
     }
 
     /**
@@ -51,10 +33,32 @@ public class Parser {
      * @param ui The UI used to display user-facing messages.
      */
     public Parser(InputList inputs, Ui ui) {
-        assert inputs != null && ui != null : "Parser dependencies must not be null";
-        this.inputs = inputs;
+        this(inputs, new zinc.contact.InputList(), ui);
+    }
+
+    /**
+     * Creates a parser that updates the supplied task and contact lists.
+     *
+     * @param taskInputs The task list to update.
+     * @param contactInputs The contact list to update.
+     */
+    public Parser(InputList taskInputs, zinc.contact.InputList contactInputs) {
+        this(taskInputs, contactInputs, new Ui());
+    }
+
+    /**
+     * Creates a parser using the supplied task list, contact list, and UI.
+     *
+     * @param taskInputs The task list to update.
+     * @param contactInputs The contact list to update.
+     * @param ui The UI used to display user-facing messages.
+     */
+    public Parser(InputList taskInputs, zinc.contact.InputList contactInputs, Ui ui) {
+        assert taskInputs != null && contactInputs != null && ui != null
+                : "Parser dependencies must not be null";
+        this.taskCommandHandler = new TaskCommandHandler(taskInputs, ui);
+        this.contactCommandHandler = new ContactCommandHandler(contactInputs, ui);
         this.ui = ui;
-        this.commands = createCommands();
     }
 
     /**
@@ -72,13 +76,24 @@ public class Parser {
         if (command.equals("bye") && parameters.isEmpty()) {
             return true;
         }
-
-        Command selectedCommand = commands.get(command);
-        if (selectedCommand != null) {
-            selectedCommand.execute(parameters);
+        if (command.equals("help")) {
+            ui.printHelp();
+            return false;
+        }
+        if (command.equals("contact") || command.equals("ct")) {
+            contactCommandHandler.execute(parameters);
+            return false;
+        }
+        if (taskCommandHandler.execute(command, parameters)) {
             return false;
         }
 
+        printUnknownCommand(command);
+        return false;
+    }
+
+    /** Prints either similar command names or the unknown-command message. */
+    private void printUnknownCommand(String command) {
         StringBuilder otherCommands = new StringBuilder();
         for (String commandName : ui.getCommands()) {
             if (commandName.startsWith(command)) {
@@ -91,130 +106,5 @@ public class Parser {
             System.out.println("Did you mean: " + otherCommands);
             System.out.println("Type help for a list of available commands");
         }
-
-        return false;
     }
-
-    /** Creates the command registry used to dispatch parsed input. */
-    private Map<String, Command> createCommands() {
-        Map<String, Command> commandMap = new HashMap<>();
-        commandMap.put("list", parameters -> {
-            if (parameters.isEmpty()) {
-                inputs.printTasks();
-            } else {
-                listTasksEndingOn(parameters);
-            }
-        });
-        commandMap.put("ls", parameters -> inputs.printTasks());
-        commandMap.put("find", this::findTasks);
-        commandMap.put("mark", this::markTask);
-        commandMap.put("unmark", this::unmarkTask);
-        commandMap.put("todo", this::addTodo);
-        commandMap.put("deadline", this::addDeadline);
-        commandMap.put("event", this::addEvent);
-        commandMap.put("delete", this::deleteTask);
-        commandMap.put("help", parameters -> ui.printHelp());
-        return commandMap;
-    }
-
-    /** Adds a todo when it has a description. */
-    private void addTodo(String description) {
-        if (description.isEmpty()) {
-            ui.printTodoUsage();
-            return;
-        }
-
-        inputs.addTask(new Todo(description));
-    }
-
-    /** Adds a deadline when it has a description and a due date. */
-    private void addDeadline(String parameters) {
-        String[] deadlineParts = parameters.split(" /by ", 2);
-        boolean isIncorrectLength = deadlineParts.length != 2;
-
-        if (isIncorrectLength || deadlineParts[0].isBlank() || deadlineParts[1].isBlank()) {
-            ui.printDeadlineUsage();
-            return;
-        }
-
-        try {
-            inputs.addTask(new Deadline(deadlineParts[0].trim(), parseDateTime(deadlineParts[1])));
-        } catch (DateTimeParseException exception) {
-            ui.printDateTimeError();
-        }
-    }
-
-    /** Adds an event when it has a description, start time, and end time. */
-    private void addEvent(String parameters) {
-        String[] eventParts = parameters.split(" /from | /to ", 3);
-        boolean isIncorrectLength = eventParts.length != 3;
-
-        if (isIncorrectLength || eventParts[0].isBlank()
-                || eventParts[1].isBlank() || eventParts[2].isBlank()) {
-            ui.printEventUsage();
-            return;
-        }
-
-        try {
-            inputs.addTask(new Event(eventParts[0].trim(), parseDateTime(eventParts[1]),
-                    parseDateTime(eventParts[2])));
-        } catch (DateTimeParseException exception) {
-            ui.printDateTimeError();
-        }
-    }
-
-    /** Converts a command date to a date-time, using midnight when no time is given. */
-    private LocalDateTime parseDateTime(String dateTime) {
-        String input = dateTime.trim();
-        if (!input.contains(" ")) {
-            input += " 0000";
-        }
-        return LocalDateTime.parse(input, DATE_TIME_FORMAT);
-    }
-
-    /** Lists deadlines and events whose end date matches the supplied date. */
-    private void listTasksEndingOn(String parameters) {
-        try {
-            inputs.printTasksEndingOn(LocalDate.parse(parameters, DATE_FORMAT));
-        } catch (DateTimeParseException exception) {
-            ui.printListDateError();
-        }
-    }
-
-    /** Finds tasks whose descriptions contain the supplied keyword. */
-    private void findTasks(String keyword) {
-        if (keyword.isBlank()) {
-            ui.printFindUsage();
-            return;
-        }
-        inputs.printTasksContaining(keyword);
-    }
-
-    /** Marks the task at the supplied user-facing task number as complete. */
-    private void markTask(String parameters) {
-        try {
-            inputs.complete(Integer.parseInt(parameters));
-        } catch (NumberFormatException exception) {
-            ui.printTaskNumberError("mark");
-        }
-    }
-
-    /** Marks the task at the supplied user-facing task number as incomplete. */
-    private void unmarkTask(String parameters) {
-        try {
-            inputs.uncomplete(Integer.parseInt(parameters));
-        } catch (NumberFormatException exception) {
-            ui.printTaskNumberError("unmark");
-        }
-    }
-
-    /** Deletes the task at the supplied user-facing task number. */
-    private void deleteTask(String parameters) {
-        try {
-            inputs.delete(Integer.parseInt(parameters));
-        } catch (NumberFormatException exception) {
-            ui.printTaskNumberError("delete");
-        }
-    }
-
 }

@@ -12,6 +12,7 @@ public class Ui {
     /** All commands currently supported by Zinc, in alphabetical order. */
     private final List<String> commands = List.of(
             "bye",
+            "contact",
             "deadline",
             "delete",
             "event",
@@ -45,6 +46,16 @@ public class Ui {
         System.out.println("Available commands:\n"
                 + "bye\n"
                 + "\tExits\n"
+                + "contact add (Alternative: ct add)\n"
+                + "\tAdds a contact; the contact number and description are optional\n"
+                + "\tUsage: contact add /n <name> [/p <8-digit contact number>] [/d <description>]\n"
+                + "contact delete (or contact del)\n"
+                + "\tDeletes a contact using its name\n"
+                + "\tUsage: contact del /n <name>\n"
+                + "contact update\n"
+                + "\tUpdates one or more fields of a contact\n"
+                + "\tUsage: contact update <current name> [/n <new name>]"
+                + " [/p <8-digit contact number>] [/d <description>]\n"
                 + "deadline\n"
                 + "\tAdds a Deadline task\n"
                 + "\tUsage: deadline <description> /by <DD/MM/YY Optional[HH:MM]>\n"
@@ -105,6 +116,21 @@ public class Ui {
     /** Prints the usage message for the find command. */
     public void printFindUsage() {
         System.out.println("Usage: find <keyword>\n");
+    }
+
+    /** Prints the usage message for contact commands. */
+    public void printContactUsage() {
+        System.out.println("Usage:\n"
+                + "contact add /n <name> [/p <8-digit contact number>] [/d <description>]\n"
+                + "contact del /n <name>\n"
+                + "contact update <current name> [/n <new name>]"
+                + " [/p <8-digit contact number>] [/d <description>]\n"
+                + "contact list <keyword>\n");
+    }
+
+    /** Prints the message used when a contact number is invalid. */
+    public void printContactNumberError() {
+        System.out.println("Contact number must contain exactly 8 digits.\n");
     }
 
     /** Prints the invalid task-number message for the given command. */
