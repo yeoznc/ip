@@ -50,7 +50,13 @@ public class Zinc {
         Scanner scanner = new Scanner(System.in);
         Zinc zinc = new Zinc();
 
-        while (!zinc.parser.parse(scanner.nextLine())) {}
+        while (true) {
+            String userInput = scanner.nextLine();
+            Boolean parserResponse = zinc.parser.parse(userInput);
+            if (!parserResponse) {
+                break;
+            }
+        }
 
         ui.printGoodbye();
     }

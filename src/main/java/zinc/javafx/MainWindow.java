@@ -36,7 +36,9 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     public void initialize() {
-        scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        dialogContainer.heightProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(() -> scrollPane.setVvalue(1.0));
+        });
         dialogContainer.getChildren().add(DialogBox
                 .getZincDialog("Hi, I’m Zinc. What should we do today?", zincImage));
     }
@@ -76,7 +78,7 @@ public class MainWindow extends AnchorPane {
     }
 
     @FXML
-    private void newConversation() {
+    private void startNewConversation() {
         dialogContainer.getChildren().clear();
         dialogContainer.getChildren().add(DialogBox.getZincDialog(
                 "What's on your mind?", zincImage));
