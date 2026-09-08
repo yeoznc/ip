@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,9 +30,9 @@ public class TaskStorage {
         }
 
         try {
-            for (String line : Files.readAllLines(STORAGE_FILE)) {
-                tasks.add(parseTask(line));
-            }
+            Files.readAllLines(STORAGE_FILE).stream()
+                    .map(this::parseTask)
+                    .forEach(tasks::add);
         } catch (IllegalArgumentException exception) {
             System.out.println("Saved task file has an invalid layout. Clearing saved tasks.\n");
             resetStorage();
@@ -50,10 +51,9 @@ public class TaskStorage {
      * @param taskCount The number of populated entries in {@code tasks}.
      */
     public void saveTasks(Task[] tasks, int taskCount) {
-        List<String> lines = new ArrayList<>();
-        for (int i = 0; i < taskCount; i++) {
-            lines.add(formatTask(tasks[i]));
-        }
+        List<String> lines = Arrays.stream(tasks, 0, taskCount)
+                .map(this::formatTask)
+                .toList();
 
         try {
             Files.createDirectories(STORAGE_FILE.getParent());
