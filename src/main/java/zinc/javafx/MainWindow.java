@@ -28,8 +28,8 @@ public class MainWindow extends AnchorPane {
 
     private Zinc zinc;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/user-avatar.png"));
-    private Image zincImage = new Image(this.getClass().getResourceAsStream("/images/zinc-avatar.png"));
+    private final Image userImage = new Image(this.getClass().getResourceAsStream("/images/user-avatar.png"));
+    private final Image zincImage = new Image(this.getClass().getResourceAsStream("/images/zinc-avatar.png"));
 
     /**
      * Initializes the center pane and prints a greeting.
@@ -43,9 +43,13 @@ public class MainWindow extends AnchorPane {
                 .getZincDialog("Hi, I’m Zinc. What should we do today?", zincImage));
     }
 
-    /** Injects the Zinc instance */
-    public void setZinc(Zinc z) {
-        zinc = z;
+    /**
+     * Injects the Zinc instance.
+     *
+     * @param zincInstance The application instance used to process commands.
+     */
+    public void setZinc(Zinc zincInstance) {
+        zinc = zincInstance;
     }
 
     /**
@@ -70,7 +74,7 @@ public class MainWindow extends AnchorPane {
     }
 
     @FXML
-    private void printHelp(javafx.event.ActionEvent event) {
+    private void printHelp() {
         String response = zinc.getResponse("help");
         dialogContainer.getChildren().addAll(
                 DialogBox.getZincDialog(response, zincImage)

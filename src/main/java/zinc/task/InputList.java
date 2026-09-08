@@ -185,7 +185,7 @@ public class InputList {
      * @return The stored task list.
      */
     public Task[] getTasks() {
-        return tasks;
+        return tasks.clone();
     }
 
     /**
