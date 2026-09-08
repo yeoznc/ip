@@ -52,7 +52,7 @@ public class Zinc {
 
         while (true) {
             String userInput = scanner.nextLine();
-            Boolean parserResponse = zinc.parser.parse(userInput);
+            boolean parserResponse = zinc.parser.parse(userInput);
             if (!parserResponse) {
                 break;
             }

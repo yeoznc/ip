@@ -73,6 +73,43 @@ public class Ui {
                 + "\tUsage: unmark <task number>\n");
     }
 
+    /** Prints the usage message for an empty todo description. */
+    public void printTodoUsage() {
+        System.out.println("The description of a todo cannot be empty.\n");
+    }
+
+    /** Prints the usage message for the deadline command. */
+    public void printDeadlineUsage() {
+        System.out.println("Usage: deadline <description> /by <DD/MM/YY Optional[HH:MM]>\n");
+    }
+
+    /** Prints the usage message for the event command. */
+    public void printEventUsage() {
+        System.out.println("Usage: event <description> /from <DD/MM/YY Optional[HH:MM]>"
+                + " /to <DD/MM/YY Optional[HH:MM]>\n");
+    }
+
+    /** Prints the invalid date/time message. */
+    public void printDateTimeError() {
+        System.out.println("Date and time must use DD/MM/YY Optional[HH:MM].\n");
+    }
+
+    /** Prints the usage message for the list date filter. */
+    public void printListDateError() {
+        System.out.println("Date must use DD/MM/YY. Usage: list <DD/MM/YY>\n");
+    }
+
+    /** Prints the usage message for the find command. */
+    public void printFindUsage() {
+        System.out.println("Usage: find <keyword>\n");
+    }
+
+    /** Prints the invalid task-number message for the given command. */
+    public void printTaskNumberError(String command) {
+        System.out.println("Task number must be an integer. Usage: " + command
+                + " <task number>\n");
+    }
+
     /** Prints the closing message. */
     public void printGoodbye() {
         System.out.println("_________________________________________\n"

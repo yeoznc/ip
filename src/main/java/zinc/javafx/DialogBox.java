@@ -48,12 +48,26 @@ public class DialogBox extends HBox {
         setAlignment(Pos.TOP_LEFT);
     }
 
-    public static DialogBox getUserDialog(String text, Image img) {
-        return new DialogBox(text, img);
+    /**
+     * Creates a dialog box aligned for user messages.
+     *
+     * @param text The message text.
+     * @param image The speaker image.
+     * @return The user-aligned dialog box.
+     */
+    public static DialogBox getUserDialog(String text, Image image) {
+        return new DialogBox(text, image);
     }
 
-    public static DialogBox getZincDialog(String text, Image img) {
-        var dialogBox = new DialogBox(text, img);
+    /**
+     * Creates a dialog box aligned for Zinc messages.
+     *
+     * @param text The message text.
+     * @param image The speaker image.
+     * @return The Zinc-aligned dialog box.
+     */
+    public static DialogBox getZincDialog(String text, Image image) {
+        DialogBox dialogBox = new DialogBox(text, image);
         dialogBox.flip();
         return dialogBox;
     }
