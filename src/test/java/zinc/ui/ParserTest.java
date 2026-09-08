@@ -20,11 +20,13 @@ import zinc.task.Todo;
 /** Tests command parsing and the tasks created by recognised commands. */
 public class ParserTest {
     private static final Path STORAGE_FILE = Path.of("data", "zincTasks.txt");
+    private static final Path CONTACT_STORAGE_FILE = Path.of("data", "zincContacts.txt");
 
     @BeforeEach
     @AfterEach
     public void clearStorage() throws Exception {
         Files.deleteIfExists(STORAGE_FILE);
+        Files.deleteIfExists(CONTACT_STORAGE_FILE);
     }
 
     @Test
@@ -152,5 +154,54 @@ public class ParserTest {
         parser.parse("find");
 
         assertEquals(1, inputList.getTaskCount());
+    }
+
+    @Test
+    public void parse_contactAddWithAllFields_success() {
+        InputList inputList = new InputList();
+        zinc.contact.InputList contactList = new zinc.contact.InputList();
+        Parser parser = new Parser(inputList, contactList);
+
+        parser.parse("contact add /n Tom /p 91234567 /d Friend");
+
+        assertEquals("Tom", contactList.getContacts().get(0).getName());
+        assertEquals("91234567", contactList.getContacts().get(0).getPhoneNumber());
+        assertEquals("Friend", contactList.getContacts().get(0).getDescription());
+    }
+
+    @Test
+    public void parse_contactAddWithInvalidPhone_failure() {
+        zinc.contact.InputList contactList = new zinc.contact.InputList();
+        Parser parser = new Parser(new InputList(), contactList);
+
+        parser.parse("contact add /n Tom /p 1234");
+
+        assertEquals(0, contactList.getContactCount());
+    }
+
+    @Test
+    public void parse_contactUpdateOnlySpecifiedFields_retainsOtherFields() {
+        zinc.contact.InputList contactList = new zinc.contact.InputList();
+        Parser parser = new Parser(new InputList(), contactList);
+        parser.parse("contact add /n Tom /p 91234567 /d Friend");
+
+        parser.parse("contact update Tom /n Tommy /d Best friend");
+
+        assertEquals("Tommy", contactList.getContacts().get(0).getName());
+        assertEquals("91234567", contactList.getContacts().get(0).getPhoneNumber());
+        assertEquals("Best friend", contactList.getContacts().get(0).getDescription());
+    }
+
+    @Test
+    public void parse_contactDeleteAliases_success() {
+        zinc.contact.InputList contactList = new zinc.contact.InputList();
+        Parser parser = new Parser(new InputList(), contactList);
+        parser.parse("contact add /n Tom");
+        parser.parse("contact add /n Jane");
+
+        parser.parse("contact del /n Tom");
+        parser.parse("contact delete /n Jane");
+
+        assertEquals(0, contactList.getContactCount());
     }
 }

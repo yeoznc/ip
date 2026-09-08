@@ -78,6 +78,10 @@
                                 onAction="#printHelp"
                                 styleClass="quickCommand"
                                 text="Command List" />
+                        <Button
+                                onAction="#printContacts"
+                                styleClass="quickCommand"
+                                text="Contact List" />
                     </HBox>
 
                     <HBox
