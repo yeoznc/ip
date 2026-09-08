@@ -7,7 +7,6 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import zinc.task.Deadline;
 import zinc.task.Event;
@@ -26,9 +25,6 @@ public class Parser {
     /** Accepts the calendar date used to filter deadlines and events. */
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/uu")
             .withResolverStyle(ResolverStyle.STRICT);
-
-    /** The date/time notation shown to users in command help and errors. */
-    private static final String DATE_TIME_USAGE = "DD/MM/YY Optional[HH:MM]";
 
     /** The task list affected by recognised commands. */
     private final InputList inputs;
@@ -78,13 +74,17 @@ public class Parser {
         }
 
         Command selectedCommand = commands.get(command);
-        if (selectedCommand != null && !(command.equals("ls") && !parameters.isEmpty())) {
+        if (selectedCommand != null) {
             selectedCommand.execute(parameters);
             return false;
         }
 
-        Stream<String> autoComplete = ui.getCommands().stream().filter(x -> x.startsWith(command));
-        String otherCommands = autoComplete.reduce("", (x, y) -> x + y + " ");
+        StringBuilder otherCommands = new StringBuilder();
+        for (String commandName : ui.getCommands()) {
+            if (commandName.startsWith(command)) {
+                otherCommands.append(commandName).append(" ");
+            }
+        }
         if (otherCommands.isEmpty()) {
             System.out.println("Sorry, I don't know what you mean. Type help for a list of available commands\n");
         } else {
@@ -120,40 +120,46 @@ public class Parser {
     /** Adds a todo when it has a description. */
     private void addTodo(String description) {
         if (description.isEmpty()) {
-            System.out.println("The description of a todo cannot be empty.\n");
+            ui.printTodoUsage();
             return;
         }
+
         inputs.addTask(new Todo(description));
     }
 
     /** Adds a deadline when it has a description and a due date. */
     private void addDeadline(String parameters) {
         String[] deadlineParts = parameters.split(" /by ", 2);
-        if (deadlineParts.length != 2 || deadlineParts[0].isBlank() || deadlineParts[1].isBlank()) {
-            System.out.println("Usage: deadline <description> /by <" + DATE_TIME_USAGE + ">\n");
+        boolean isIncorrectLength = deadlineParts.length != 2;
+
+        if (isIncorrectLength || deadlineParts[0].isBlank() || deadlineParts[1].isBlank()) {
+            ui.printDeadlineUsage();
             return;
         }
+
         try {
             inputs.addTask(new Deadline(deadlineParts[0].trim(), parseDateTime(deadlineParts[1])));
         } catch (DateTimeParseException exception) {
-            System.out.println("Date and time must use " + DATE_TIME_USAGE + ".\n");
+            ui.printDateTimeError();
         }
     }
 
     /** Adds an event when it has a description, start time, and end time. */
     private void addEvent(String parameters) {
         String[] eventParts = parameters.split(" /from | /to ", 3);
-        if (eventParts.length != 3 || eventParts[0].isBlank()
+        boolean isIncorrectLength = eventParts.length != 3;
+
+        if (isIncorrectLength || eventParts[0].isBlank()
                 || eventParts[1].isBlank() || eventParts[2].isBlank()) {
-            System.out.println("Usage: event <description> /from <" + DATE_TIME_USAGE + "> /to <"
-                    + DATE_TIME_USAGE + ">\n");
+            ui.printEventUsage();
             return;
         }
+
         try {
             inputs.addTask(new Event(eventParts[0].trim(), parseDateTime(eventParts[1]),
                     parseDateTime(eventParts[2])));
         } catch (DateTimeParseException exception) {
-            System.out.println("Date and time must use " + DATE_TIME_USAGE + ".\n");
+            ui.printDateTimeError();
         }
     }
 
@@ -171,14 +177,14 @@ public class Parser {
         try {
             inputs.printTasksEndingOn(LocalDate.parse(parameters, DATE_FORMAT));
         } catch (DateTimeParseException exception) {
-            System.out.println("Date must use DD/MM/YY. Usage: list <DD/MM/YY>\n");
+            ui.printListDateError();
         }
     }
 
     /** Finds tasks whose descriptions contain the supplied keyword. */
     private void findTasks(String keyword) {
         if (keyword.isBlank()) {
-            System.out.println("Usage: find <keyword>\n");
+            ui.printFindUsage();
             return;
         }
         inputs.printTasksContaining(keyword);
@@ -189,7 +195,7 @@ public class Parser {
         try {
             inputs.complete(Integer.parseInt(parameters));
         } catch (NumberFormatException exception) {
-            System.out.println("Task number must be an integer. Usage: mark <task number>\n");
+            ui.printTaskNumberError("mark");
         }
     }
 
@@ -198,7 +204,7 @@ public class Parser {
         try {
             inputs.uncomplete(Integer.parseInt(parameters));
         } catch (NumberFormatException exception) {
-            System.out.println("Task number must be an integer. Usage: unmark <task number>\n");
+            ui.printTaskNumberError("unmark");
         }
     }
 
@@ -207,7 +213,7 @@ public class Parser {
         try {
             inputs.delete(Integer.parseInt(parameters));
         } catch (NumberFormatException exception) {
-            System.out.println("Task number must be an integer. Usage: delete <task number>\n");
+            ui.printTaskNumberError("delete");
         }
     }
 
