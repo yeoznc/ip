@@ -6,6 +6,7 @@ package zinc.task;
 public abstract class Task {
     /** The description of this task. */
     private final String taskName;
+    /** Whether this task has been completed. */
     private boolean isCompleted;
 
     /**
@@ -14,6 +15,7 @@ public abstract class Task {
      * @param taskName The description of the task.
      */
     Task(String taskName) {
+        assert taskName != null && !taskName.isBlank() : "Task name must not be blank";
         this.taskName = taskName;
         this.isCompleted = false;
     }
@@ -54,11 +56,8 @@ public abstract class Task {
      */
     @Override
     public String toString() {
-        if (isCompleted) {
-            return "[X] " + taskName;
-        } else {
-            return "[ ] " + taskName;
-        }
+        String completionMarker = isCompleted ? "[X] " : "[ ] ";
+        return completionMarker + taskName;
     }
 
     /**

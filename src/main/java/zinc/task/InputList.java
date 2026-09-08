@@ -40,6 +40,7 @@ public class InputList {
      * @param task The task to store.
      */
     public void addTask(Task task) {
+        assert task != null : "Task to add must not be null";
         if (taskCount < MAX_INPUTS) {
             tasks[taskCount] = task;
             taskCount++;
@@ -103,6 +104,7 @@ public class InputList {
 
     /** Returns whether a deadline or event ends on the specified date. */
     private boolean endsOn(Task task, LocalDate date) {
+        assert task != null && date != null : "Task and date must not be null";
         if (task instanceof Deadline) {
             return ((Deadline) task).getDeadline().toLocalDate().equals(date);
         }
@@ -185,7 +187,7 @@ public class InputList {
      * @return The stored task list.
      */
     public Task[] getTasks() {
-        return tasks;
+        return tasks.clone();
     }
 
     /**
@@ -199,6 +201,7 @@ public class InputList {
 
     /** Saves the current list after a task has been changed. */
     private void saveTasks() {
+        assert taskCount >= 0 && taskCount <= MAX_INPUTS : "Task count must be within list bounds";
         storage.saveTasks(tasks, taskCount);
     }
 }

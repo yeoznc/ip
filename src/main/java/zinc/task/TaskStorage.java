@@ -51,6 +51,8 @@ public class TaskStorage {
      * @param taskCount The number of populated entries in {@code tasks}.
      */
     public void saveTasks(Task[] tasks, int taskCount) {
+        assert tasks != null : "Tasks to save must not be null";
+        assert taskCount >= 0 && taskCount <= tasks.length : "Task count must fit in the task array";
         List<String> lines = Arrays.stream(tasks, 0, taskCount)
                 .map(this::formatTask)
                 .toList();
