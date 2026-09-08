@@ -2,6 +2,10 @@ package zinc.task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+import zinc.ui.Ui;
 
 /**
  * Stores up to 100 user inputs and prints them as a numbered list.
@@ -14,10 +18,7 @@ public class InputList {
     private static final DateTimeFormatter DISPLAY_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
 
     /** The stored user inputs. */
-    private final Task[] tasks = new Task[MAX_INPUTS];
-
-    /** The number of inputs currently stored. */
-    private int taskCount;
+    private final List<Task> tasks = new ArrayList<>();
 
     /** The component responsible for persisting the task list. */
     private final TaskStorage storage = new TaskStorage();
@@ -27,10 +28,10 @@ public class InputList {
      */
     public InputList() {
         for (Task task : storage.loadTasks()) {
-            if (taskCount == MAX_INPUTS) {
+            if (tasks.size() == MAX_INPUTS) {
                 break;
             }
-            tasks[taskCount++] = task;
+            tasks.add(task);
         }
     }
 
@@ -41,30 +42,29 @@ public class InputList {
      */
     public void addTask(Task task) {
         assert task != null : "Task to add must not be null";
-        if (taskCount < MAX_INPUTS) {
-            tasks[taskCount] = task;
-            taskCount++;
+        if (tasks.size() < MAX_INPUTS) {
+            tasks.add(task);
             saveTasks();
         }
 
-        System.out.println("_________________________________________\n"
+        System.out.println(Ui.SEPARATOR + "\n"
                 + "Task added to list:\n"
                 + task.getTaskType().getDisplayIdentifier() + task.toString() + "\n"
-                + "You have " + taskCount + " tasks in the list\n"
-                + "_________________________________________\n");
+                + "You have " + tasks.size() + " tasks in the list\n"
+                + Ui.SEPARATOR + "\n");
     }
 
     /**
      * Prints every stored task with its list number.
      */
     public void printTasks() {
-        System.out.println("_________________________________________\n"
+        System.out.println(Ui.SEPARATOR + "\n"
                 + "Here are your current tasks:\n");
-        for (int i = 0; i < taskCount; i++) {
-            System.out.println((i + 1) + ". " + tasks[i].getTaskType().getDisplayIdentifier()
-                    + tasks[i].toString());
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + ". " + tasks.get(i).getTaskType().getDisplayIdentifier()
+                    + tasks.get(i).toString());
         }
-        System.out.println("_________________________________________\n");
+        System.out.println(Ui.SEPARATOR + "\n");
     }
 
     /**
@@ -74,15 +74,15 @@ public class InputList {
      * @param date The date on which matching tasks end.
      */
     public void printTasksEndingOn(LocalDate date) {
-        System.out.println("_________________________________________\n"
+        System.out.println(Ui.SEPARATOR + "\n"
                 + "Here are your tasks ending on " + date.format(DISPLAY_DATE_FORMAT) + ":\n");
-        for (int i = 0; i < taskCount; i++) {
-            if (endsOn(tasks[i], date)) {
+        for (int i = 0; i < tasks.size(); i++) {
+            if (endsOn(tasks.get(i), date)) {
                 System.out.println((i + 1) + ". "
-                        + tasks[i].getTaskType().getDisplayIdentifier() + tasks[i]);
+                        + tasks.get(i).getTaskType().getDisplayIdentifier() + tasks.get(i));
             }
         }
-        System.out.println("_________________________________________\n");
+        System.out.println(Ui.SEPARATOR + "\n");
     }
 
     /**
@@ -91,15 +91,15 @@ public class InputList {
      * @param keyword The exact, case-sensitive text to search for.
      */
     public void printTasksContaining(String keyword) {
-        System.out.println("_________________________________________\n"
+        System.out.println(Ui.SEPARATOR + "\n"
                 + "Here are your tasks containing \"" + keyword + "\":\n");
-        for (int i = 0; i < taskCount; i++) {
-            if (tasks[i].getTaskName().contains(keyword)) {
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).getTaskName().contains(keyword)) {
                 System.out.println((i + 1) + ". "
-                        + tasks[i].getTaskType().getDisplayIdentifier() + tasks[i]);
+                        + tasks.get(i).getTaskType().getDisplayIdentifier() + tasks.get(i));
             }
         }
-        System.out.println("_________________________________________\n");
+        System.out.println(Ui.SEPARATOR + "\n");
     }
 
     /** Returns whether a deadline or event ends on the specified date. */
@@ -120,16 +120,16 @@ public class InputList {
      * @param index The index of the task in the 1-indexed list.
      */
     public void complete(int index) {
-        if (taskCount < index || index <= 0) {
+        if (tasks.size() < index || index <= 0) {
             System.out.println("No such task found\n");
             return;
         }
-        tasks[index - 1].complete();
+        tasks.get(index - 1).complete();
         saveTasks();
-        System.out.println("_________________________________________\n"
+        System.out.println(Ui.SEPARATOR + "\n"
                 + "Task marked as done:\n"
-                + tasks[index - 1].toString()
-                + "\n_________________________________________\n");
+                + tasks.get(index - 1).toString()
+                + "\n" + Ui.SEPARATOR + "\n");
 
     }
 
@@ -139,16 +139,16 @@ public class InputList {
      * @param index The index of the task in the 1-indexed list.
      */
     public void uncomplete(int index) {
-        if (taskCount < index || index <= 0) {
+        if (tasks.size() < index || index <= 0) {
             System.out.println("No such task found\n");
             return;
         }
-        tasks[index - 1].uncomplete();
+        tasks.get(index - 1).uncomplete();
         saveTasks();
-        System.out.println("_________________________________________\n"
+        System.out.println(Ui.SEPARATOR + "\n"
                 + "Task unmarked as done:\n"
-                + tasks[index - 1].toString()
-                + "\n_________________________________________\n");
+                + tasks.get(index - 1).toString()
+                + "\n" + Ui.SEPARATOR + "\n");
     }
 
     /**
@@ -157,28 +157,21 @@ public class InputList {
      * @param index The task number shown to the user, starting from 1.
      */
     public void delete(int index) {
-        int arrayIndex = index - 1;
+        int listIndex = index - 1;
 
-        if (arrayIndex < 0 || arrayIndex >= taskCount) {
+        if (listIndex < 0 || listIndex >= tasks.size()) {
             System.out.println("No such task found\n");
             return;
         }
 
-        Task deletedTask = tasks[arrayIndex];
-
-        for (int i = arrayIndex; i < taskCount - 1; i++) {
-            tasks[i] = tasks[i + 1];
-        }
-
-        taskCount--;
-        tasks[taskCount] = null;
+        Task deletedTask = tasks.remove(listIndex);
         saveTasks();
 
-        System.out.println("_________________________________________\n"
+        System.out.println(Ui.SEPARATOR + "\n"
                 + "Task deleted:\n"
                 + deletedTask.getTaskType().getDisplayIdentifier() + deletedTask + "\n"
-                + "You have " + taskCount + " tasks in the list\n"
-                + "_________________________________________\n");
+                + "You have " + tasks.size() + " tasks in the list\n"
+                + Ui.SEPARATOR + "\n");
     }
 
     /**
@@ -186,8 +179,8 @@ public class InputList {
      *
      * @return The stored task list.
      */
-    public Task[] getTasks() {
-        return tasks.clone();
+    public List<Task> getTasks() {
+        return new ArrayList<>(tasks);
     }
 
     /**
@@ -196,12 +189,12 @@ public class InputList {
      * @return The number of items currently in the stored list.
      */
     public int getTaskCount() {
-        return taskCount;
+        return tasks.size();
     }
 
     /** Saves the current list after a task has been changed. */
     private void saveTasks() {
-        assert taskCount >= 0 && taskCount <= MAX_INPUTS : "Task count must be within list bounds";
-        storage.saveTasks(tasks, taskCount);
+        assert tasks.size() <= MAX_INPUTS : "Task count must be within list bounds";
+        storage.saveTasks(tasks);
     }
 }

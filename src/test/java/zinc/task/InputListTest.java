@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 
 /** Tests adding, completing, and deleting tasks in an input list. */
 public class InputListTest {
-    private static final Path STORAGE_FILE = Path.of("data", "zinc.txt");
+    private static final Path STORAGE_FILE = Path.of("data", "zincTasks.txt");
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd")
             .withResolverStyle(ResolverStyle.STRICT);
 
@@ -36,7 +36,7 @@ public class InputListTest {
 
         inputList.addTask(todo);
 
-        assertEquals(todo, inputList.getTasks()[0]);
+        assertEquals(todo, inputList.getTasks().get(0));
     }
 
     @Test
@@ -58,7 +58,7 @@ public class InputListTest {
 
         inputList.addTask(deadline);
 
-        assertEquals(deadline, inputList.getTasks()[0]);
+        assertEquals(deadline, inputList.getTasks().get(0));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class InputListTest {
 
         inputList.addTask(deadline);
 
-        assertEquals(deadline, inputList.getTasks()[0]);
+        assertEquals(deadline, inputList.getTasks().get(0));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class InputListTest {
         InputList inputList = new InputList();
         inputList.addTask(event);
 
-        assertEquals(event, inputList.getTasks()[0]);
+        assertEquals(event, inputList.getTasks().get(0));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class InputListTest {
 
         inputList.addTask(event);
 
-        assertEquals(event, inputList.getTasks()[0]);
+        assertEquals(event, inputList.getTasks().get(0));
     }
 
     @Test
@@ -102,7 +102,7 @@ public class InputListTest {
 
         inputList.complete(1);
 
-        assertTrue(inputList.getTasks()[0].isCompleted());
+        assertTrue(inputList.getTasks().get(0).isCompleted());
     }
 
     @Test
@@ -113,7 +113,7 @@ public class InputListTest {
 
         inputList.uncomplete(1);
 
-        assertFalse(inputList.getTasks()[0].isCompleted());
+        assertFalse(inputList.getTasks().get(0).isCompleted());
     }
 
     @Test
@@ -124,8 +124,8 @@ public class InputListTest {
 
         inputList.delete(1);
 
-        assertEquals("Second", inputList.getTasks()[0].getTaskName());
-        assertEquals(null, inputList.getTasks()[1]);
+        assertEquals("Second", inputList.getTasks().get(0).getTaskName());
+        assertEquals(1, inputList.getTasks().size());
     }
 
     @Test
@@ -136,8 +136,8 @@ public class InputListTest {
 
         inputList.delete(2);
 
-        assertEquals("First", inputList.getTasks()[0].getTaskName());
-        assertEquals(null, inputList.getTasks()[1]);
+        assertEquals("First", inputList.getTasks().get(0).getTaskName());
+        assertEquals(1, inputList.getTasks().size());
     }
 
     @Test
@@ -150,7 +150,7 @@ public class InputListTest {
 
         inputList.printTasksEndingOn(LocalDate.of(2026, 8, 27));
 
-        assertEquals("Submit report", inputList.getTasks()[0].getTaskName());
+        assertEquals("Submit report", inputList.getTasks().get(0).getTaskName());
     }
 
     @Test

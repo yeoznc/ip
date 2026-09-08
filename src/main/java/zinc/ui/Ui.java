@@ -6,6 +6,9 @@ import java.util.List;
  * Handles the user-facing presentation of Zinc.
  */
 public class Ui {
+    /** The horizontal separator used between sections of user-facing output. */
+    public static final String SEPARATOR = "_________________________________________";
+
     /** All commands currently supported by Zinc, in alphabetical order. */
     private final List<String> commands = List.of(
             "bye",
@@ -34,7 +37,7 @@ public class Ui {
     public void printGreeting() {
         System.out.println("Hello, my name's Zinc.\n"
                 + "What can I do for you?\n"
-                + "_________________________________________");
+                + SEPARATOR);
     }
 
     /** Prints the currently supported commands and their usage. */
@@ -112,9 +115,9 @@ public class Ui {
 
     /** Prints the closing message. */
     public void printGoodbye() {
-        System.out.println("_________________________________________\n"
+        System.out.println(SEPARATOR + "\n"
                 + "Goodbye.\n"
-                + "_________________________________________");
+                + SEPARATOR);
     }
 
     /**

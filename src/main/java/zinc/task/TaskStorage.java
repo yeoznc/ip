@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,7 +12,7 @@ import java.util.List;
  */
 public class TaskStorage {
     /** The file used to retain tasks between application runs. */
-    private static final Path STORAGE_FILE = Path.of("data", "zinc.txt");
+    private static final Path STORAGE_FILE = Path.of("data", "zincTasks.txt");
 
     /**
      * Returns the tasks currently saved in the storage file.
@@ -45,15 +44,13 @@ public class TaskStorage {
     }
 
     /**
-     * Writes every task in the supplied array to the storage file.
+     * Writes every task in the supplied list to the storage file.
      *
-     * @param tasks The task array to save.
-     * @param taskCount The number of populated entries in {@code tasks}.
+     * @param tasks The task list to save.
      */
-    public void saveTasks(Task[] tasks, int taskCount) {
+    public void saveTasks(List<Task> tasks) {
         assert tasks != null : "Tasks to save must not be null";
-        assert taskCount >= 0 && taskCount <= tasks.length : "Task count must fit in the task array";
-        List<String> lines = Arrays.stream(tasks, 0, taskCount)
+        List<String> lines = tasks.stream()
                 .map(this::formatTask)
                 .toList();
 

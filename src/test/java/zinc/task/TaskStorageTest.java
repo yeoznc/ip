@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 /** Tests saving, loading, and recovery of persisted tasks. */
 public class TaskStorageTest {
-    private static final Path STORAGE_FILE = Path.of("data", "zinc.txt");
+    private static final Path STORAGE_FILE = Path.of("data", "zincTasks.txt");
 
     @BeforeEach
     @AfterEach
@@ -41,7 +41,7 @@ public class TaskStorageTest {
         tasks[1].complete();
         TaskStorage storage = new TaskStorage();
 
-        storage.saveTasks(tasks, tasks.length);
+        storage.saveTasks(List.of(tasks));
         List<Task> loadedTasks = storage.loadTasks();
 
         assertEquals(3, loadedTasks.size());
@@ -56,7 +56,7 @@ public class TaskStorageTest {
 
     @Test
     public void saveTasks_withZeroCount_createsEmptyFile() throws Exception {
-        new TaskStorage().saveTasks(new Task[2], 0);
+        new TaskStorage().saveTasks(List.of());
 
         assertTrue(Files.exists(STORAGE_FILE));
         assertTrue(Files.readAllLines(STORAGE_FILE).isEmpty());

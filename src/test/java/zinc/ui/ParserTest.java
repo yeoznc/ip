@@ -19,7 +19,7 @@ import zinc.task.Todo;
 
 /** Tests command parsing and the tasks created by recognised commands. */
 public class ParserTest {
-    private static final Path STORAGE_FILE = Path.of("data", "zinc.txt");
+    private static final Path STORAGE_FILE = Path.of("data", "zincTasks.txt");
 
     @BeforeEach
     @AfterEach
@@ -48,8 +48,8 @@ public class ParserTest {
 
         parser.parse("todo Buy bread");
 
-        assertEquals("Buy bread", inputList.getTasks()[0].getTaskName());
-        assertTrue(inputList.getTasks()[0] instanceof Todo);
+        assertEquals("Buy bread", inputList.getTasks().get(0).getTaskName());
+        assertTrue(inputList.getTasks().get(0) instanceof Todo);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class ParserTest {
 
         parser.parse("deadline Submit report /by 27/08/26");
 
-        Deadline deadline = (Deadline) inputList.getTasks()[0];
+        Deadline deadline = (Deadline) inputList.getTasks().get(0);
         assertEquals(LocalDateTime.of(2026, 8, 27, 0, 0), deadline.getDeadline());
     }
 
@@ -80,7 +80,7 @@ public class ParserTest {
 
         parser.parse("deadline Submit report /by 27/08/26 1830");
 
-        Deadline deadline = (Deadline) inputList.getTasks()[0];
+        Deadline deadline = (Deadline) inputList.getTasks().get(0);
         assertEquals(LocalDateTime.of(2026, 8, 27, 18, 30), deadline.getDeadline());
     }
 
@@ -101,7 +101,7 @@ public class ParserTest {
 
         parser.parse("event Meeting /from 27/08/26 1000 /to 27/08/26 1100");
 
-        Event event = (Event) inputList.getTasks()[0];
+        Event event = (Event) inputList.getTasks().get(0);
         assertEquals(LocalDateTime.of(2026, 8, 27, 10, 0), event.getStart());
         assertEquals(LocalDateTime.of(2026, 8, 27, 11, 0), event.getEnd());
     }
@@ -113,10 +113,10 @@ public class ParserTest {
         parser.parse("todo Buy bread");
 
         parser.parse("mark 1");
-        assertTrue(inputList.getTasks()[0].toString().startsWith("[X]"));
+        assertTrue(inputList.getTasks().get(0).toString().startsWith("[X]"));
 
         parser.parse("unmark 1");
-        assertFalse(inputList.getTasks()[0].toString().startsWith("[X]"));
+        assertFalse(inputList.getTasks().get(0).toString().startsWith("[X]"));
     }
 
     @Test
@@ -139,8 +139,8 @@ public class ParserTest {
 
         parser.parse("find bread");
 
-        assertEquals("Buy bread", inputList.getTasks()[0].getTaskName());
-        assertEquals("Read book", inputList.getTasks()[1].getTaskName());
+        assertEquals("Buy bread", inputList.getTasks().get(0).getTaskName());
+        assertEquals("Read book", inputList.getTasks().get(1).getTaskName());
     }
 
     @Test
