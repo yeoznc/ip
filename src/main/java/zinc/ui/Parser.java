@@ -55,6 +55,7 @@ public class Parser {
      * @param ui The UI used to display user-facing messages.
      */
     public Parser(InputList inputs, Ui ui) {
+        assert inputs != null && ui != null : "Parser dependencies must not be null";
         this.inputs = inputs;
         this.ui = ui;
         this.commands = createCommands();
@@ -67,6 +68,7 @@ public class Parser {
      * @return {@code true} when the user entered {@code bye}; otherwise, {@code false}.
      */
     public boolean parse(String input) {
+        assert input != null : "Command input must not be null";
         String[] commandParts = input.trim().split(" ", 2);
         String command = commandParts[0];
         String parameters = commandParts.length > 1 ? commandParts[1].trim() : "";
