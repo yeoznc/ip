@@ -59,7 +59,7 @@ public class ParserTest {
 
         parser.parse("todo");
 
-        assertEquals(0, inputList.getItemCount());
+        assertEquals(0, inputList.getTaskCount());
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ParserTest {
 
         parser.parse("deadline Submit report /by 31/02/26");
 
-        assertEquals(0, inputList.getItemCount());
+        assertEquals(0, inputList.getTaskCount());
     }
 
     @Test
@@ -127,7 +127,7 @@ public class ParserTest {
 
         parser.parse("delete 1");
 
-        assertEquals(0, inputList.getItemCount());
+        assertEquals(0, inputList.getTaskCount());
     }
 
     @Test
@@ -151,6 +151,6 @@ public class ParserTest {
 
         parser.parse("find");
 
-        assertEquals(1, inputList.getItemCount());
+        assertEquals(1, inputList.getTaskCount());
     }
 }

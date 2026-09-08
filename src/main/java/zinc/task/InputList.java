@@ -14,10 +14,10 @@ public class InputList {
     private static final DateTimeFormatter DISPLAY_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
 
     /** The stored user inputs. */
-    private final Task[] items = new Task[MAX_INPUTS];
+    private final Task[] tasks = new Task[MAX_INPUTS];
 
     /** The number of inputs currently stored. */
-    private int itemCount;
+    private int taskCount;
 
     /** The component responsible for persisting the task list. */
     private final TaskStorage storage = new TaskStorage();
@@ -27,10 +27,10 @@ public class InputList {
      */
     public InputList() {
         for (Task task : storage.loadTasks()) {
-            if (itemCount == MAX_INPUTS) {
+            if (taskCount == MAX_INPUTS) {
                 break;
             }
-            items[itemCount++] = task;
+            tasks[taskCount++] = task;
         }
     }
 
@@ -40,28 +40,28 @@ public class InputList {
      * @param task The task to store.
      */
     public void addTask(Task task) {
-        if (itemCount < MAX_INPUTS) {
-            items[itemCount] = task;
-            itemCount++;
+        if (taskCount < MAX_INPUTS) {
+            tasks[taskCount] = task;
+            taskCount++;
             saveTasks();
         }
 
         System.out.println("_________________________________________\n"
                 + "Task added to list:\n"
                 + task.getTaskType().getDisplayIdentifier() + task.toString() + "\n"
-                + "You have " + itemCount + " tasks in the list\n"
+                + "You have " + taskCount + " tasks in the list\n"
                 + "_________________________________________\n");
     }
 
     /**
      * Prints every stored task with its list number.
      */
-    public void printItems() {
+    public void printTasks() {
         System.out.println("_________________________________________\n"
                 + "Here are your current tasks:\n");
-        for (int i = 0; i < itemCount; i++) {
-            System.out.println((i + 1) + ". " + items[i].getTaskType().getDisplayIdentifier()
-                    + items[i].toString());
+        for (int i = 0; i < taskCount; i++) {
+            System.out.println((i + 1) + ". " + tasks[i].getTaskType().getDisplayIdentifier()
+                    + tasks[i].toString());
         }
         System.out.println("_________________________________________\n");
     }
@@ -75,10 +75,10 @@ public class InputList {
     public void printTasksEndingOn(LocalDate date) {
         System.out.println("_________________________________________\n"
                 + "Here are your tasks ending on " + date.format(DISPLAY_DATE_FORMAT) + ":\n");
-        for (int i = 0; i < itemCount; i++) {
-            if (endsOn(items[i], date)) {
+        for (int i = 0; i < taskCount; i++) {
+            if (endsOn(tasks[i], date)) {
                 System.out.println((i + 1) + ". "
-                        + items[i].getTaskType().getDisplayIdentifier() + items[i]);
+                        + tasks[i].getTaskType().getDisplayIdentifier() + tasks[i]);
             }
         }
         System.out.println("_________________________________________\n");
@@ -92,10 +92,10 @@ public class InputList {
     public void printTasksContaining(String keyword) {
         System.out.println("_________________________________________\n"
                 + "Here are your tasks containing \"" + keyword + "\":\n");
-        for (int i = 0; i < itemCount; i++) {
-            if (items[i].getTaskName().contains(keyword)) {
+        for (int i = 0; i < taskCount; i++) {
+            if (tasks[i].getTaskName().contains(keyword)) {
                 System.out.println((i + 1) + ". "
-                        + items[i].getTaskType().getDisplayIdentifier() + items[i]);
+                        + tasks[i].getTaskType().getDisplayIdentifier() + tasks[i]);
             }
         }
         System.out.println("_________________________________________\n");
@@ -113,39 +113,39 @@ public class InputList {
     }
 
     /**
-     * Changes task to a completed state
+     * Changes task to a completed state.
      *
      * @param index The index of the task in the 1-indexed list.
      */
     public void complete(int index) {
-        if (itemCount < index || index <= 0) {
+        if (taskCount < index || index <= 0) {
             System.out.println("No such task found\n");
             return;
         }
-        items[index - 1].complete();
+        tasks[index - 1].complete();
         saveTasks();
         System.out.println("_________________________________________\n"
                 + "Task marked as done:\n"
-                + items[index - 1].toString()
+                + tasks[index - 1].toString()
                 + "\n_________________________________________\n");
 
     }
 
     /**
-     * Changes task to a uncompleted state
+     * Changes task to an uncompleted state.
      *
      * @param index The index of the task in the 1-indexed list.
      */
     public void uncomplete(int index) {
-        if (itemCount < index || index <= 0) {
+        if (taskCount < index || index <= 0) {
             System.out.println("No such task found\n");
             return;
         }
-        items[index - 1].uncomplete();
+        tasks[index - 1].uncomplete();
         saveTasks();
         System.out.println("_________________________________________\n"
                 + "Task unmarked as done:\n"
-                + items[index - 1].toString()
+                + tasks[index - 1].toString()
                 + "\n_________________________________________\n");
     }
 
@@ -157,25 +157,25 @@ public class InputList {
     public void delete(int index) {
         int arrayIndex = index - 1;
 
-        if (arrayIndex < 0 || arrayIndex >= itemCount) {
+        if (arrayIndex < 0 || arrayIndex >= taskCount) {
             System.out.println("No such task found\n");
             return;
         }
 
-        Task deletedTask = items[arrayIndex];
+        Task deletedTask = tasks[arrayIndex];
 
-        for (int i = arrayIndex; i < itemCount - 1; i++) {
-            items[i] = items[i + 1];
+        for (int i = arrayIndex; i < taskCount - 1; i++) {
+            tasks[i] = tasks[i + 1];
         }
 
-        itemCount--;
-        items[itemCount] = null;
+        taskCount--;
+        tasks[taskCount] = null;
         saveTasks();
 
         System.out.println("_________________________________________\n"
                 + "Task deleted:\n"
                 + deletedTask.getTaskType().getDisplayIdentifier() + deletedTask + "\n"
-                + "You have " + itemCount + " tasks in the list\n"
+                + "You have " + taskCount + " tasks in the list\n"
                 + "_________________________________________\n");
     }
 
@@ -185,7 +185,7 @@ public class InputList {
      * @return The stored task list.
      */
     public Task[] getTasks() {
-        return items;
+        return tasks;
     }
 
     /**
@@ -193,12 +193,12 @@ public class InputList {
      *
      * @return The number of items currently in the stored list.
      */
-    public int getItemCount() {
-        return itemCount;
+    public int getTaskCount() {
+        return taskCount;
     }
 
     /** Saves the current list after a task has been changed. */
     private void saveTasks() {
-        storage.saveTasks(items, itemCount);
+        storage.saveTasks(tasks, taskCount);
     }
 }

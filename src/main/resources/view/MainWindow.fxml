@@ -24,7 +24,7 @@
 
             <Button
                     maxWidth="Infinity"
-                    onAction="#newConversation"
+                    onAction="#startNewConversation"
                     styleClass="new-chat"
                     text="New conversation" />
 
@@ -56,6 +56,7 @@
                 <ScrollPane
                         fx:id="scrollPane"
                         fitToWidth="true"
+                        pannable="true"
                         hbarPolicy="NEVER"
                         styleClass="message-scroll">
                     <content>

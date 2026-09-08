@@ -24,7 +24,7 @@ public class Main extends Application {
             Scene scene = new Scene(ap);
             scene.getStylesheets().add(Main.class.getResource("/view/main.css").toExternalForm());
             stage.setScene(scene);
-            fxmlLoader.<MainWindow>getController().setZinc(zinc); // inject the Duke instance
+            fxmlLoader.<MainWindow>getController().setZinc(zinc);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

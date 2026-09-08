@@ -6,30 +6,30 @@ package zinc.task;
 public abstract class Task {
     /** The description of this task. */
     private final String taskName;
-    private boolean completed;
+    private boolean isCompleted;
 
     /**
      * Creates a new task.
      *
-     * @param name The description of the task.
+     * @param taskName The description of the task.
      */
-    Task(String name) {
-        this.taskName = name;
-        this.completed = false;
+    Task(String taskName) {
+        this.taskName = taskName;
+        this.isCompleted = false;
     }
 
     /**
      * Completes the task.
      */
     void complete() {
-        this.completed = true;
+        this.isCompleted = true;
     }
 
     /**
      * Marks the task as incomplete.
      */
     void uncomplete() {
-        this.completed = false;
+        this.isCompleted = false;
     }
 
     /**
@@ -38,10 +38,10 @@ public abstract class Task {
      * @return {@code true} if the task is complete; otherwise, {@code false}.
      */
     boolean isCompleted() {
-        return this.completed;
+        return this.isCompleted;
     }
 
-    /** Returns the task description. */
+    /** Returns the task description.*/
     public String getTaskName() {
         return taskName;
     }
@@ -54,7 +54,7 @@ public abstract class Task {
      */
     @Override
     public String toString() {
-        if (completed) {
+        if (isCompleted) {
             return "[X] " + taskName;
         } else {
             return "[ ] " + taskName;

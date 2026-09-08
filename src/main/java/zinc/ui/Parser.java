@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import zinc.task.Deadline;
@@ -34,6 +36,9 @@ public class Parser {
     /** The UI used to display user-facing messages. */
     private final Ui ui;
 
+    /** Commands indexed by their user-facing names. */
+    private final Map<String, Command> commands;
+
     /**
      * Creates a parser that updates the given task list.
      *
@@ -52,6 +57,7 @@ public class Parser {
     public Parser(InputList inputs, Ui ui) {
         this.inputs = inputs;
         this.ui = ui;
+        this.commands = createCommands();
     }
 
     /**
@@ -67,37 +73,46 @@ public class Parser {
 
         if (command.equals("bye") && parameters.isEmpty()) {
             return true;
-        } else if (isCommand(command, "list", "ls") && parameters.isEmpty()) {
-            inputs.printItems();
-        } else if (command.equals("list")) {
-            listTasksEndingOn(parameters);
-        } else if (command.equals("find")) {
-            findTasks(parameters);
-        } else if (command.equals("mark")) {
-            markTask(parameters);
-        } else if (command.equals("unmark")) {
-            unmarkTask(parameters);
-        } else if (command.equals("todo")) {
-            addTodo(parameters);
-        } else if (command.equals("deadline")) {
-            addDeadline(parameters);
-        } else if (command.equals("event")) {
-            addEvent(parameters);
-        } else if (command.equals("delete")) {
-            deleteTask(parameters);
-        } else if (command.equals("help")) {
-            ui.printHelp();
-        } else {
-            Stream<String> autoComplete = ui.getCommands().stream().filter(x -> x.startsWith(command));
-            String otherCommands = autoComplete.reduce("", (x, y) -> x + y + " ");
-            if (otherCommands.isEmpty()) {
-                System.out.println("Sorry, I don't know what you mean. Type help for a list of available commands\n");
-            } else {
-                System.out.println("Did you mean: " + otherCommands);
-                System.out.println("Type help for a list of available commands");
-            }
         }
+
+        Command selectedCommand = commands.get(command);
+        if (selectedCommand != null && !(command.equals("ls") && !parameters.isEmpty())) {
+            selectedCommand.execute(parameters);
+            return false;
+        }
+
+        Stream<String> autoComplete = ui.getCommands().stream().filter(x -> x.startsWith(command));
+        String otherCommands = autoComplete.reduce("", (x, y) -> x + y + " ");
+        if (otherCommands.isEmpty()) {
+            System.out.println("Sorry, I don't know what you mean. Type help for a list of available commands\n");
+        } else {
+            System.out.println("Did you mean: " + otherCommands);
+            System.out.println("Type help for a list of available commands");
+        }
+
         return false;
+    }
+
+    /** Creates the command registry used to dispatch parsed input. */
+    private Map<String, Command> createCommands() {
+        Map<String, Command> commandMap = new HashMap<>();
+        commandMap.put("list", parameters -> {
+            if (parameters.isEmpty()) {
+                inputs.printTasks();
+            } else {
+                listTasksEndingOn(parameters);
+            }
+        });
+        commandMap.put("ls", parameters -> inputs.printTasks());
+        commandMap.put("find", this::findTasks);
+        commandMap.put("mark", this::markTask);
+        commandMap.put("unmark", this::unmarkTask);
+        commandMap.put("todo", this::addTodo);
+        commandMap.put("deadline", this::addDeadline);
+        commandMap.put("event", this::addEvent);
+        commandMap.put("delete", this::deleteTask);
+        commandMap.put("help", parameters -> ui.printHelp());
+        return commandMap;
     }
 
     /** Adds a todo when it has a description. */
@@ -194,19 +209,4 @@ public class Parser {
         }
     }
 
-    /**
-     * Tries to identify if the user input is equivalent to a valid command or its alias.
-     *
-     * @param command User input.
-     * @param names Possible corresponding commands.
-     * @return True if user input is equivalent to one of the commands in the second parameter. False otherwise.
-     */
-    private boolean isCommand(String command, String... names) {
-        for (String name : names) {
-            if (command.equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

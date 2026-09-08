@@ -46,7 +46,7 @@ public class InputListTest {
             inputList.addTask(new Todo("Buy bread"));
         }
 
-        assertEquals(100, inputList.getItemCount());
+        assertEquals(100, inputList.getTaskCount());
     }
 
     @Test
