@@ -1,13 +1,26 @@
 package zinc.ui;
 
 import zinc.contact.ContactCommandHandler;
-import zinc.task.InputList;
+import zinc.contact.ContactList;
 import zinc.task.TaskCommandHandler;
+import zinc.task.TaskList;
 
 /**
  * Interprets top-level user commands and delegates domain operations.
  */
-public class Parser {
+public class CommandParser {
+    /** The command that exits Zinc. */
+    private static final String EXIT_COMMAND = "bye";
+
+    /** The command that displays usage information. */
+    private static final String HELP_COMMAND = "help";
+
+    /** The full contact-command name. */
+    private static final String CONTACT_COMMAND = "contact";
+
+    /** The short contact-command alias. */
+    private static final String CONTACT_COMMAND_ALIAS = "ct";
+
     /** The handler for commands that operate on tasks. */
     private final TaskCommandHandler taskCommandHandler;
 
@@ -20,20 +33,20 @@ public class Parser {
     /**
      * Creates a parser that updates the given task list.
      *
-     * @param inputs The task list to update.
+     * @param taskList The task list to update.
      */
-    public Parser(InputList inputs) {
-        this(inputs, new zinc.contact.InputList(), new Ui());
+    public CommandParser(TaskList taskList) {
+        this(taskList, new ContactList(), new Ui());
     }
 
     /**
      * Creates a parser that updates the given task list using the given UI.
      *
-     * @param inputs The task list to update.
+     * @param taskList The task list to update.
      * @param ui The UI used to display user-facing messages.
      */
-    public Parser(InputList inputs, Ui ui) {
-        this(inputs, new zinc.contact.InputList(), ui);
+    public CommandParser(TaskList taskList, Ui ui) {
+        this(taskList, new ContactList(), ui);
     }
 
     /**
@@ -42,8 +55,8 @@ public class Parser {
      * @param taskInputs The task list to update.
      * @param contactInputs The contact list to update.
      */
-    public Parser(InputList taskInputs, zinc.contact.InputList contactInputs) {
-        this(taskInputs, contactInputs, new Ui());
+    public CommandParser(TaskList taskList, ContactList contactList) {
+        this(taskList, contactList, new Ui());
     }
 
     /**
@@ -53,11 +66,11 @@ public class Parser {
      * @param contactInputs The contact list to update.
      * @param ui The UI used to display user-facing messages.
      */
-    public Parser(InputList taskInputs, zinc.contact.InputList contactInputs, Ui ui) {
-        assert taskInputs != null && contactInputs != null && ui != null
-                : "Parser dependencies must not be null";
-        this.taskCommandHandler = new TaskCommandHandler(taskInputs, ui);
-        this.contactCommandHandler = new ContactCommandHandler(contactInputs, ui);
+    public CommandParser(TaskList taskList, ContactList contactList, Ui ui) {
+        assert taskList != null && contactList != null && ui != null
+                : "Command-parser dependencies must not be null";
+        this.taskCommandHandler = new TaskCommandHandler(taskList, ui);
+        this.contactCommandHandler = new ContactCommandHandler(contactList, ui);
         this.ui = ui;
     }
 
@@ -67,20 +80,25 @@ public class Parser {
      * @param input The complete line entered by the user.
      * @return {@code true} when the user entered {@code bye}; otherwise, {@code false}.
      */
-    public boolean parse(String input) {
+    public boolean parseCommand(String input) {
         assert input != null : "Command input must not be null";
-        String[] commandParts = input.trim().split(" ", 2);
+        String trimmedInput = input.trim();
+        if (trimmedInput.isEmpty()) {
+            return false;
+        }
+
+        String[] commandParts = trimmedInput.split("\\s+", 2);
         String command = commandParts[0];
         String parameters = commandParts.length > 1 ? commandParts[1].trim() : "";
 
-        if (command.equals("bye") && parameters.isEmpty()) {
+        if (command.equals(EXIT_COMMAND) && parameters.isEmpty()) {
             return true;
         }
-        if (command.equals("help")) {
+        if (command.equals(HELP_COMMAND)) {
             ui.printHelp();
             return false;
         }
-        if (command.equals("contact") || command.equals("ct")) {
+        if (command.equals(CONTACT_COMMAND) || command.equals(CONTACT_COMMAND_ALIAS)) {
             contactCommandHandler.execute(parameters);
             return false;
         }

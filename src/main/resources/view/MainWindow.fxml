@@ -75,11 +75,11 @@
                         styleClass="composer-wrap">
                     <HBox spacing="8">
                         <Button
-                                onAction="#printHelp"
+                                onAction="#showHelp"
                                 styleClass="quickCommand"
                                 text="Command List" />
                         <Button
-                                onAction="#printContacts"
+                                onAction="#showContactList"
                                 styleClass="quickCommand"
                                 text="Contact List" />
                     </HBox>
@@ -93,7 +93,6 @@
                                 promptText="Message Zinc..."
                                 HBox.hgrow="ALWAYS" />
                         <Button
-                                fx:id="sendButton"
                                 onAction="#handleUserInput"
                                 styleClass="send-button"
                                 text=">" />

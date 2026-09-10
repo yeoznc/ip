@@ -12,11 +12,20 @@ import zinc.ui.Ui;
  * Parses and executes contact subcommands.
  */
 public class ContactCommandHandler {
+    /** The field key identifying a contact name. */
+    private static final String NAME_FIELD = "n";
+
+    /** The field key identifying a contact phone number. */
+    private static final String PHONE_NUMBER_FIELD = "p";
+
+    /** The field key identifying a contact description. */
+    private static final String DESCRIPTION_FIELD = "d";
+
     /** Identifies contact field prefixes in a command. */
     private static final Pattern CONTACT_FIELD_PATTERN = Pattern.compile("(?:^|\\s)/(n|p|d)(?:\\s|$)");
 
     /** The contact list affected by commands. */
-    private final InputList contactInputs;
+    private final ContactList contactList;
 
     /** The UI used to display validation messages. */
     private final Ui ui;
@@ -27,12 +36,12 @@ public class ContactCommandHandler {
     /**
      * Creates a handler for commands that affect the supplied contact list.
      *
-     * @param contactInputs The contact list to update.
+     * @param contactList The contact list to update.
      * @param ui The UI used to display validation messages.
      */
-    public ContactCommandHandler(InputList contactInputs, Ui ui) {
-        assert contactInputs != null && ui != null : "Contact command dependencies must not be null";
-        this.contactInputs = contactInputs;
+    public ContactCommandHandler(ContactList contactList, Ui ui) {
+        assert contactList != null && ui != null : "Contact command dependencies must not be null";
+        this.contactList = contactList;
         this.ui = ui;
         this.commands = createCommands();
     }
@@ -64,45 +73,46 @@ public class ContactCommandHandler {
                 "delete", this::deleteContact,
                 "update", this::updateContact,
                 "list", this::listContacts,
-                "ls", parameters -> contactInputs.printContacts());
+                "ls", ignoredParameters -> contactList.printContacts());
     }
 
     /** Lists every contact or only contacts with a supplied name. */
     private void listContacts(String parameters) {
         if (parameters.isEmpty()) {
-            contactInputs.printContacts();
+            contactList.printContacts();
         } else {
-            contactInputs.listContactsWithName(parameters);
+            contactList.printContactsNamed(parameters);
         }
     }
 
     /** Validates contact fields and adds a contact. */
     private void addContact(String arguments) {
-        Map<String, String> fields = parseContactFields(arguments, 0);
-        if (fields == null || !fields.containsKey("n") || fields.get("n").isBlank()) {
+        Map<String, String> contactFields = parseContactFields(arguments, 0);
+        if (contactFields == null || !contactFields.containsKey(NAME_FIELD)
+                || contactFields.get(NAME_FIELD).isBlank()) {
             ui.printContactUsage();
             return;
         }
 
-        String phoneNumber = fields.getOrDefault("p", "");
-        if (fields.containsKey("p") && !isValidPhoneNumber(phoneNumber)) {
+        String phoneNumber = contactFields.getOrDefault(PHONE_NUMBER_FIELD, "");
+        if (contactFields.containsKey(PHONE_NUMBER_FIELD) && !Contact.isValidPhoneNumber(phoneNumber)) {
             ui.printContactNumberError();
             return;
         }
 
-        contactInputs.addContact(new Contact(fields.get("n"), phoneNumber,
-                fields.getOrDefault("d", "")));
+        contactList.addContact(new Contact(contactFields.get(NAME_FIELD), phoneNumber,
+                contactFields.getOrDefault(DESCRIPTION_FIELD, "")));
     }
 
     /** Validates a contact name and deletes its matching contact. */
     private void deleteContact(String arguments) {
-        Map<String, String> fields = parseContactFields(arguments, 0);
-        if (fields == null || fields.size() != 1 || !fields.containsKey("n")
-                || fields.get("n").isBlank()) {
+        Map<String, String> contactFields = parseContactFields(arguments, 0);
+        if (contactFields == null || contactFields.size() != 1 || !contactFields.containsKey(NAME_FIELD)
+                || contactFields.get(NAME_FIELD).isBlank()) {
             ui.printContactUsage();
             return;
         }
-        contactInputs.deleteContact(fields.get("n"));
+        contactList.deleteContact(contactFields.get(NAME_FIELD));
     }
 
     /** Validates replacement fields and updates their matching contact. */
@@ -114,59 +124,55 @@ public class ContactCommandHandler {
         }
 
         String currentName = arguments.substring(0, firstField.start()).trim();
-        Map<String, String> fields = parseContactFields(arguments, firstField.start());
-        if (currentName.isBlank() || fields == null || fields.isEmpty()) {
+        Map<String, String> contactFields = parseContactFields(arguments, firstField.start());
+        if (currentName.isBlank() || contactFields == null || contactFields.isEmpty()) {
             ui.printContactUsage();
             return;
         }
 
-        if (fields.containsKey("n") && fields.get("n").isBlank()) {
+        if (contactFields.containsKey(NAME_FIELD) && contactFields.get(NAME_FIELD).isBlank()) {
             ui.printContactUsage();
             return;
         }
 
-        String phoneNumber = fields.get("p");
-        if (fields.containsKey("p") && !isValidPhoneNumber(phoneNumber)) {
+        String phoneNumber = contactFields.get(PHONE_NUMBER_FIELD);
+        if (contactFields.containsKey(PHONE_NUMBER_FIELD) && !Contact.isValidPhoneNumber(phoneNumber)) {
             ui.printContactNumberError();
             return;
         }
 
-        contactInputs.updateContact(currentName, fields.get("n"), fields.get("p"), fields.get("d"));
+        contactList.updateContact(currentName, contactFields.get(NAME_FIELD), phoneNumber,
+                contactFields.get(DESCRIPTION_FIELD));
     }
 
     /** Parses prefixed contact fields, returning {@code null} for invalid or duplicate fields. */
     private Map<String, String> parseContactFields(String arguments, int startIndex) {
         String fieldsText = arguments.substring(startIndex).trim();
         Matcher matcher = CONTACT_FIELD_PATTERN.matcher(fieldsText);
-        Map<String, String> fields = new LinkedHashMap<>();
+        Map<String, String> contactFields = new LinkedHashMap<>();
         int previousValueStart = -1;
-        String previousKey = null;
+        String previousFieldName = null;
 
         while (matcher.find()) {
-            if (previousKey == null && matcher.start() != 0) {
+            if (previousFieldName == null && matcher.start() != 0) {
                 return null;
             }
-            if (previousKey != null) {
+            if (previousFieldName != null) {
                 String value = fieldsText.substring(previousValueStart, matcher.start()).trim();
-                fields.put(previousKey, value);
+                contactFields.put(previousFieldName, value);
             }
-            String key = matcher.group(1);
-            if (fields.containsKey(key) || key.equals(previousKey)) {
+            String fieldName = matcher.group(1);
+            if (contactFields.containsKey(fieldName) || fieldName.equals(previousFieldName)) {
                 return null;
             }
-            previousKey = key;
+            previousFieldName = fieldName;
             previousValueStart = matcher.end();
         }
 
-        if (previousKey == null) {
+        if (previousFieldName == null) {
             return null;
         }
-        fields.put(previousKey, fieldsText.substring(previousValueStart).trim());
-        return fields;
-    }
-
-    /** Returns whether a supplied phone number contains exactly eight digits. */
-    private boolean isValidPhoneNumber(String phoneNumber) {
-        return phoneNumber.matches("\\d{8}");
+        contactFields.put(previousFieldName, fieldsText.substring(previousValueStart).trim());
+        return contactFields;
     }
 }

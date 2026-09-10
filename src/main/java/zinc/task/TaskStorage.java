@@ -11,6 +11,36 @@ import java.util.List;
  * Saves tasks to, and restores tasks from, Zinc's local data file.
  */
 public class TaskStorage {
+    /** The separator between fields in the task-storage format. */
+    private static final String FIELD_SEPARATOR = " | ";
+
+    /** The regular expression used to split stored task fields. */
+    private static final String FIELD_SEPARATOR_REGEX = " \\| ";
+
+    /** The field index containing the task type. */
+    private static final int TYPE_INDEX = 0;
+
+    /** The field index containing the completion status. */
+    private static final int STATUS_INDEX = 1;
+
+    /** The field index containing the task description. */
+    private static final int DESCRIPTION_INDEX = 2;
+
+    /** The field index containing a deadline's due date and time. */
+    private static final int DEADLINE_INDEX = 3;
+
+    /** The field index containing an event's start date and time. */
+    private static final int EVENT_START_INDEX = 3;
+
+    /** The field index containing an event's end date and time. */
+    private static final int EVENT_END_INDEX = 4;
+
+    /** The marker representing a completed task. */
+    private static final String COMPLETED_STATUS = "1";
+
+    /** The marker representing an incomplete task. */
+    private static final String INCOMPLETE_STATUS = "0";
+
     /** The file used to retain tasks between application runs. */
     private static final Path STORAGE_FILE = Path.of("data", "zincTasks.txt");
 
@@ -70,42 +100,56 @@ public class TaskStorage {
      * @throws IllegalArgumentException If the line does not match the storage layout.
      */
     private Task parseTask(String line) {
-        String[] parts = line.split(" \\| ", -1);
-        if (parts.length < 2 || !parts[1].matches("[01]")) {
-            throw new IllegalArgumentException("Invalid task type or completion status");
-        }
+        String[] storedFields = line.split(FIELD_SEPARATOR_REGEX, -1);
+        validateCommonFields(storedFields);
 
-        Task task;
-        switch (parts[0]) {
-            case "T":
-                requireFieldCount(parts, 3);
-                task = new Todo(parts[2]);
-                break;
-            case "D":
-                requireFieldCount(parts, 4);
-                task = new Deadline(parts[2], LocalDateTime.parse(parts[3]));
-                break;
-            case "E":
-                requireFieldCount(parts, 5);
-                task = new Event(parts[2], LocalDateTime.parse(parts[3]), LocalDateTime.parse(parts[4]));
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown task type");
-        }
-        for (int i = 2; i < parts.length; i++) {
-            if (parts[i].isBlank()) {
-                throw new IllegalArgumentException("Task information cannot be blank");
-            }
-        }
-        if (parts[1].equals("1")) {
-            task.complete();
+        TaskType taskType = TaskType.fromStorageIdentifier(storedFields[TYPE_INDEX]);
+        Task task = createTask(taskType, storedFields);
+        if (storedFields[STATUS_INDEX].equals(COMPLETED_STATUS)) {
+            task.markAsCompleted();
         }
         return task;
     }
 
+    /** Validates fields shared by every stored task type. */
+    private void validateCommonFields(String[] storedFields) {
+        if (storedFields.length <= DESCRIPTION_INDEX) {
+            throw new IllegalArgumentException("Stored task is missing required fields");
+        }
+        String completionStatus = storedFields[STATUS_INDEX];
+        if (!completionStatus.equals(COMPLETED_STATUS) && !completionStatus.equals(INCOMPLETE_STATUS)) {
+            throw new IllegalArgumentException("Invalid task completion status");
+        }
+        for (int i = DESCRIPTION_INDEX; i < storedFields.length; i++) {
+            if (storedFields[i].isBlank()) {
+                throw new IllegalArgumentException("Task information cannot be blank");
+            }
+        }
+    }
+
+    /** Creates the task represented by validated storage fields. */
+    private Task createTask(TaskType taskType, String[] storedFields) {
+        switch (taskType) {
+            case TODO:
+                requireFieldCount(storedFields, 3);
+                return new Todo(storedFields[DESCRIPTION_INDEX]);
+            case DEADLINE:
+                requireFieldCount(storedFields, 4);
+                return new Deadline(storedFields[DESCRIPTION_INDEX],
+                        LocalDateTime.parse(storedFields[DEADLINE_INDEX]));
+            case EVENT:
+                requireFieldCount(storedFields, 5);
+                return new Event(storedFields[DESCRIPTION_INDEX],
+                        LocalDateTime.parse(storedFields[EVENT_START_INDEX]),
+                        LocalDateTime.parse(storedFields[EVENT_END_INDEX]));
+            default:
+                throw new IllegalArgumentException("Unsupported task type");
+        }
+    }
+
     /** Ensures that a saved task has exactly the expected number of fields. */
-    private void requireFieldCount(String[] parts, int expectedCount) {
-        if (parts.length != expectedCount) {
+    private void requireFieldCount(String[] storedFields, int expectedCount) {
+        if (storedFields.length != expectedCount) {
             throw new IllegalArgumentException("Incorrect number of task fields");
         }
     }
@@ -121,17 +165,18 @@ public class TaskStorage {
 
     /** Converts a task into the pre-determined storage format. */
     private String formatTask(Task task) {
-        String status = task.isCompleted() ? "1" : "0";
+        String status = task.isCompleted() ? COMPLETED_STATUS : INCOMPLETE_STATUS;
+        String commonFields = task.getTaskType().getStorageIdentifier() + FIELD_SEPARATOR
+                + status + FIELD_SEPARATOR + task.getDescription();
         switch (task.getTaskType()) {
             case TODO:
-                return "T | " + status + " | " + task.getTaskName();
+                return commonFields;
             case DEADLINE:
                 Deadline deadline = (Deadline) task;
-                return "D | " + status + " | " + deadline.getTaskName() + " | " + deadline.getDeadline();
+                return commonFields + FIELD_SEPARATOR + deadline.getDeadline();
             case EVENT:
                 Event event = (Event) task;
-                return "E | " + status + " | " + event.getTaskName()
-                        + " | " + event.getStart() + " | " + event.getEnd();
+                return commonFields + FIELD_SEPARATOR + event.getStart() + FIELD_SEPARATOR + event.getEnd();
             default:
                 throw new IllegalArgumentException("Unsupported task type");
         }

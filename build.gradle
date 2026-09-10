@@ -57,7 +57,7 @@ test {
 }
 
 application {
-    mainClass = 'zinc.javafx.Launcher'
+    mainClass = 'zinc.javafx.ZincLauncher'
 }
 
 jar {

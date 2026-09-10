@@ -9,7 +9,25 @@ import java.util.List;
 /**
  * Saves contacts to, and restores contacts from, Zinc's local contact file.
  */
-public class Storage {
+public class ContactStorage {
+    /** The separator between fields in the contact-storage format. */
+    private static final String FIELD_SEPARATOR = " | ";
+
+    /** The regular expression used to split stored contact fields. */
+    private static final String FIELD_SEPARATOR_REGEX = " \\| ";
+
+    /** The number of fields required in a stored contact. */
+    private static final int FIELD_COUNT = 3;
+
+    /** The field index containing the contact name. */
+    private static final int NAME_INDEX = 0;
+
+    /** The field index containing the contact phone number. */
+    private static final int PHONE_NUMBER_INDEX = 1;
+
+    /** The field index containing the contact description. */
+    private static final int DESCRIPTION_INDEX = 2;
+
     /** The file used to retain contacts between application runs. */
     private static final Path STORAGE_FILE = Path.of("data", "zincContacts.txt");
 
@@ -60,15 +78,15 @@ public class Storage {
 
     /** Converts a stored line into a contact. */
     private Contact parseContact(String line) {
-        String[] fields = line.split(" \\| ", 3);
-        if (fields.length != 3) {
+        String[] storedFields = line.split(FIELD_SEPARATOR_REGEX, FIELD_COUNT);
+        if (storedFields.length != FIELD_COUNT) {
             throw new IllegalArgumentException("Incorrect number of contact fields");
         }
 
-        String name = fields[0];
-        String phoneNumber = fields[1];
-        String description = fields[2];
-        if (name.isBlank() || (!phoneNumber.isEmpty() && !phoneNumber.matches("\\d{8}"))) {
+        String name = storedFields[NAME_INDEX];
+        String phoneNumber = storedFields[PHONE_NUMBER_INDEX];
+        String description = storedFields[DESCRIPTION_INDEX];
+        if (name.isBlank() || (!phoneNumber.isEmpty() && !Contact.isValidPhoneNumber(phoneNumber))) {
             throw new IllegalArgumentException("Invalid contact details");
         }
         return new Contact(name, phoneNumber, description);
@@ -76,8 +94,8 @@ public class Storage {
 
     /** Converts a contact into the storage format. */
     private String formatContact(Contact contact) {
-        return contact.getName() + " | "
-                + contact.getPhoneNumber() + " | "
+        return contact.getName() + FIELD_SEPARATOR
+                + contact.getPhoneNumber() + FIELD_SEPARATOR
                 + contact.getDescription();
     }
 

@@ -1,9 +1,14 @@
 package zinc.contact;
 
+import java.util.regex.Pattern;
+
 /**
  * Represents a person's contact details.
  */
 public class Contact {
+    /** The required layout of a supplied phone number. */
+    private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile("\\d{8}");
+
     /** The contact's name. */
     private final String name;
 
@@ -24,7 +29,7 @@ public class Contact {
         assert name != null && phoneNumber != null && description != null
                 : "Contact fields must not be null";
         assert !name.isBlank() : "Contact name must not be blank";
-        assert phoneNumber.isEmpty() || phoneNumber.matches("\\d{8}")
+        assert phoneNumber.isEmpty() || isValidPhoneNumber(phoneNumber)
                 : "Contact number must be empty or contain eight digits";
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -66,8 +71,13 @@ public class Contact {
      * @param updatedDescription The replacement description.
      * @return A contact containing the updated details.
      */
-    public Contact update(String updatedName, String updatedPhoneNumber, String updatedDescription) {
+    public Contact withUpdatedDetails(String updatedName, String updatedPhoneNumber, String updatedDescription) {
         return new Contact(updatedName, updatedPhoneNumber, updatedDescription);
+    }
+
+    /** Returns whether a phone number contains exactly eight digits. */
+    static boolean isValidPhoneNumber(String phoneNumber) {
+        return PHONE_NUMBER_PATTERN.matcher(phoneNumber).matches();
     }
 
     /** Returns a user-facing representation of this contact. */

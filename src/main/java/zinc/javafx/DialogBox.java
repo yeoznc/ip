@@ -1,7 +1,9 @@
 package zinc.javafx;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
+import java.util.Objects;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,32 +21,43 @@ import javafx.scene.layout.HBox;
  * and a label containing text from the speaker.
  */
 public class DialogBox extends HBox {
+    /** The label containing the message text. */
     @FXML
-    private Label dialog;
+    private Label messageLabel;
+
+    /** The image identifying the message's speaker. */
     @FXML
     private ImageView displayPicture;
 
-    private DialogBox(String text, Image img) {
+    /**
+     * Creates a dialog box containing the supplied message and speaker image.
+     *
+     * @param text The message to display.
+     * @param image The image representing the speaker.
+     */
+    private DialogBox(String text, Image image) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
+            URL layoutUrl = Objects.requireNonNull(MainWindow.class.getResource("/view/DialogBox.fxml"),
+                    "Dialog-box layout is missing");
+            FXMLLoader fxmlLoader = new FXMLLoader(layoutUrl);
             fxmlLoader.setController(this);
             fxmlLoader.setRoot(this);
             fxmlLoader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to load the dialog-box layout", exception);
         }
 
-        dialog.setText(text);
-        displayPicture.setImage(img);
+        messageLabel.setText(text);
+        displayPicture.setImage(image);
     }
 
     /**
-     * Flips the dialog box such that the ImageView is on the left and text on the right.
+     * Places Zinc's image on the left and its message on the right.
      */
-    private void flip() {
-        ObservableList<Node> tmp = FXCollections.observableArrayList(this.getChildren());
-        Collections.reverse(tmp);
-        getChildren().setAll(tmp);
+    private void alignForZinc() {
+        ObservableList<Node> dialogComponents = FXCollections.observableArrayList(getChildren());
+        Collections.reverse(dialogComponents);
+        getChildren().setAll(dialogComponents);
         setAlignment(Pos.TOP_LEFT);
     }
 
@@ -55,7 +68,7 @@ public class DialogBox extends HBox {
      * @param image The speaker image.
      * @return The user-aligned dialog box.
      */
-    public static DialogBox getUserDialog(String text, Image image) {
+    public static DialogBox createUserDialog(String text, Image image) {
         return new DialogBox(text, image);
     }
 
@@ -66,9 +79,9 @@ public class DialogBox extends HBox {
      * @param image The speaker image.
      * @return The Zinc-aligned dialog box.
      */
-    public static DialogBox getZincDialog(String text, Image image) {
+    public static DialogBox createZincDialog(String text, Image image) {
         DialogBox dialogBox = new DialogBox(text, image);
-        dialogBox.flip();
+        dialogBox.alignForZinc();
         return dialogBox;
     }
 }

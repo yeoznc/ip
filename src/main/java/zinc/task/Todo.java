@@ -5,10 +5,10 @@ public class Todo extends Task {
     /**
      * Creates a todo task.
      *
-     * @param name The description of the task.
+     * @param description The description of the task.
      */
-    public Todo(String name) {
-        super(name);
+    public Todo(String description) {
+        super(description);
     }
 
     /**

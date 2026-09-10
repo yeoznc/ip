@@ -38,7 +38,7 @@ public class TaskStorageTest {
             new Event("Meeting", LocalDateTime.of(2026, 8, 27, 10, 0),
                     LocalDateTime.of(2026, 8, 27, 11, 0))
         };
-        tasks[1].complete();
+        tasks[1].markAsCompleted();
         TaskStorage storage = new TaskStorage();
 
         storage.saveTasks(List.of(tasks));
@@ -46,7 +46,7 @@ public class TaskStorageTest {
 
         assertEquals(3, loadedTasks.size());
         assertTrue(loadedTasks.get(0) instanceof Todo);
-        assertEquals("Buy bread", loadedTasks.get(0).getTaskName());
+        assertEquals("Buy bread", loadedTasks.get(0).getDescription());
         assertTrue(loadedTasks.get(1) instanceof Deadline);
         assertTrue(loadedTasks.get(1).isCompleted());
         Deadline loadedDeadline = (Deadline) loadedTasks.get(1);

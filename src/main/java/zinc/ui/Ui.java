@@ -10,7 +10,7 @@ public class Ui {
     public static final String SEPARATOR = "_________________________________________";
 
     /** All commands currently supported by Zinc, in alphabetical order. */
-    private final List<String> commands = List.of(
+    private static final List<String> SUPPORTED_COMMANDS = List.of(
             "bye",
             "contact",
             "deadline",
@@ -22,6 +22,50 @@ public class Ui {
             "mark",
             "todo",
             "unmark");
+
+    /** Instructions displayed by the help command. */
+    private static final String HELP_MESSAGE = """
+            Available commands:
+            bye
+            \tExits
+            contact add (Alternative: ct add)
+            \tAdds a contact; the contact number and description are optional
+            \tUsage: contact add /n <name> [/p <8-digit contact number>] [/d <description>]
+            contact delete (or contact del)
+            \tDeletes a contact using its name
+            \tUsage: contact del /n <name>
+            contact update
+            \tUpdates one or more fields of a contact
+            \tUsage: contact update <current name> [/n <new name>] [/p <8-digit contact number>] [/d <description>]
+            deadline
+            \tAdds a Deadline task
+            \tUsage: deadline <description> /by <DD/MM/YY Optional[HH:MM]>
+            delete
+            \tDeletes a task
+            \tUsage: delete <task number>
+            event
+            \tAdds an Event task
+            \tUsage: event <description> /from <DD/MM/YY Optional[HH:MM]> /to <DD/MM/YY Optional[HH:MM]>
+            find
+            \tFinds tasks whose descriptions contain a keyword
+            \tUsage: find <keyword>
+            help
+            \tShows this help list
+            \tUsage: help
+            list
+            \tLists all added tasks
+            \tUsage: list
+            \tUsage: list <DD/MM/YY> to list deadlines and events ending that day
+            mark
+            \tMarks task as done
+            \tUsage: mark <task number>
+            todo
+            \tAdds a ToDo task
+            \tUsage: todo <description>
+            unmark
+            \tMarks task as undone
+            \tUsage: unmark <task number>
+            """;
 
     /** Prints the Zinc banner. */
     public void printBanner() {
@@ -43,48 +87,7 @@ public class Ui {
 
     /** Prints the currently supported commands and their usage. */
     public void printHelp() {
-        System.out.println("Available commands:\n"
-                + "bye\n"
-                + "\tExits\n"
-                + "contact add (Alternative: ct add)\n"
-                + "\tAdds a contact; the contact number and description are optional\n"
-                + "\tUsage: contact add /n <name> [/p <8-digit contact number>] [/d <description>]\n"
-                + "contact delete (or contact del)\n"
-                + "\tDeletes a contact using its name\n"
-                + "\tUsage: contact del /n <name>\n"
-                + "contact update\n"
-                + "\tUpdates one or more fields of a contact\n"
-                + "\tUsage: contact update <current name> [/n <new name>]"
-                + " [/p <8-digit contact number>] [/d <description>]\n"
-                + "deadline\n"
-                + "\tAdds a Deadline task\n"
-                + "\tUsage: deadline <description> /by <DD/MM/YY Optional[HH:MM]>\n"
-                + "delete\n"
-                + "\tDeletes a task\n"
-                + "\tUsage: delete <task number>\n"
-                + "event\n"
-                + "\tAdds an Event task\n"
-                + "\tUsage: event <description> /from <DD/MM/YY Optional[HH:MM]>"
-                + " /to <DD/MM/YY Optional[HH:MM]>\n"
-                + "find\n"
-                + "\tFinds tasks whose descriptions contain a keyword\n"
-                + "\tUsage: find <keyword>\n"
-                + "help\n"
-                + "\tShows this help list\n"
-                + "\tUsage: help\n"
-                + "list\n"
-                + "\tLists all added tasks\n"
-                + "\tUsage: list\n"
-                + "\tUsage: list <DD/MM/YY> to list deadlines and events ending that day\n"
-                + "mark\n"
-                + "\tMarks task as done\n"
-                + "\tUsage: mark <task number>\n"
-                + "todo\n"
-                + "\tAdds a ToDo task\n"
-                + "\tUsage: todo <description>\n"
-                + "unmark\n"
-                + "\tMarks task as undone\n"
-                + "\tUsage: unmark <task number>\n");
+        System.out.println(HELP_MESSAGE);
     }
 
     /** Prints the usage message for an empty todo description. */
@@ -101,6 +104,16 @@ public class Ui {
     public void printEventUsage() {
         System.out.println("Usage: event <description> /from <DD/MM/YY Optional[HH:MM]>"
                 + " /to <DD/MM/YY Optional[HH:MM]>\n");
+    }
+
+    /** Prints the message used when an event ends before it starts. */
+    public void printEventChronologyError() {
+        System.out.println("An event cannot end before it starts.\n");
+    }
+
+    /** Prints the message used when the task list has reached its capacity. */
+    public void printTaskListFull() {
+        System.out.println("The task list is full. Delete a task before adding another.\n");
     }
 
     /** Prints the invalid date/time message. */
@@ -152,6 +165,6 @@ public class Ui {
      * @return An immutable list of command names.
      */
     public List<String> getCommands() {
-        return commands;
+        return SUPPORTED_COMMANDS;
     }
 }

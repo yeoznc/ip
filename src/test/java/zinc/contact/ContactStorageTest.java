@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /** Tests contact persistence. */
-public class StorageTest {
+public class ContactStorageTest {
     private static final Path STORAGE_FILE = Path.of("data", "zincContacts.txt");
 
     @BeforeEach
@@ -22,10 +22,10 @@ public class StorageTest {
 
     @Test
     public void saveContacts_thenLoadContacts_restoresAllFields() throws Exception {
-        Storage storage = new Storage();
-        storage.saveContacts(List.of(new Contact("Tom Tan", "91234567", "Friend | neighbor")));
+        ContactStorage contactStorage = new ContactStorage();
+        contactStorage.saveContacts(List.of(new Contact("Tom Tan", "91234567", "Friend | neighbor")));
 
-        Contact loadedContact = storage.loadContacts().get(0);
+        Contact loadedContact = contactStorage.loadContacts().get(0);
 
         assertEquals("Tom Tan | 91234567 | Friend | neighbor", Files.readString(STORAGE_FILE).trim());
         assertEquals("Tom Tan", loadedContact.getName());

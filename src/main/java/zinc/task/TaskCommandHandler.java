@@ -24,7 +24,7 @@ public class TaskCommandHandler {
             .withResolverStyle(ResolverStyle.STRICT);
 
     /** The task list affected by commands. */
-    private final InputList taskInputs;
+    private final TaskList taskList;
 
     /** The UI used to display validation messages. */
     private final Ui ui;
@@ -35,12 +35,12 @@ public class TaskCommandHandler {
     /**
      * Creates a handler for commands that affect the supplied task list.
      *
-     * @param taskInputs The task list to update.
+     * @param taskList The task list to update.
      * @param ui The UI used to display validation messages.
      */
-    public TaskCommandHandler(InputList taskInputs, Ui ui) {
-        assert taskInputs != null && ui != null : "Task command dependencies must not be null";
-        this.taskInputs = taskInputs;
+    public TaskCommandHandler(TaskList taskList, Ui ui) {
+        assert taskList != null && ui != null : "Task command dependencies must not be null";
+        this.taskList = taskList;
         this.ui = ui;
         this.commands = createCommands();
     }
@@ -67,7 +67,7 @@ public class TaskCommandHandler {
     private Map<String, Consumer<String>> createCommands() {
         return Map.of(
                 "list", this::listTasks,
-                "ls", parameters -> taskInputs.printTasks(),
+                "ls", ignoredParameters -> taskList.printTasks(),
                 "find", this::findTasks,
                 "mark", parameters -> changeTaskCompletion(parameters, true),
                 "unmark", parameters -> changeTaskCompletion(parameters, false),
@@ -80,12 +80,12 @@ public class TaskCommandHandler {
     /** Lists every task or only tasks ending on a supplied date. */
     private void listTasks(String parameters) {
         if (parameters.isEmpty()) {
-            taskInputs.printTasks();
+            taskList.printTasks();
             return;
         }
 
         try {
-            taskInputs.printTasksEndingOn(LocalDate.parse(parameters, DATE_FORMAT));
+            taskList.printTasksEndingOn(LocalDate.parse(parameters, DATE_FORMAT));
         } catch (DateTimeParseException exception) {
             ui.printListDateError();
         }
@@ -98,7 +98,7 @@ public class TaskCommandHandler {
             return;
         }
 
-        taskInputs.addTask(new Todo(description));
+        taskList.addTask(new Todo(description));
     }
 
     /** Adds a deadline when it has a description and a due date. */
@@ -112,7 +112,7 @@ public class TaskCommandHandler {
         }
 
         try {
-            taskInputs.addTask(new Deadline(deadlineParts[0].trim(), parseDateTime(deadlineParts[1])));
+            taskList.addTask(new Deadline(deadlineParts[0].trim(), parseDateTime(deadlineParts[1])));
         } catch (DateTimeParseException exception) {
             ui.printDateTimeError();
         }
@@ -130,20 +130,26 @@ public class TaskCommandHandler {
         }
 
         try {
-            taskInputs.addTask(new Event(eventParts[0].trim(), parseDateTime(eventParts[1]),
-                    parseDateTime(eventParts[2])));
+            LocalDateTime start = parseDateTime(eventParts[1]);
+            LocalDateTime end = parseDateTime(eventParts[2]);
+            if (end.isBefore(start)) {
+                ui.printEventChronologyError();
+                return;
+            }
+
+            taskList.addTask(new Event(eventParts[0].trim(), start, end));
         } catch (DateTimeParseException exception) {
             ui.printDateTimeError();
         }
     }
 
     /** Converts a command date to a date-time, using midnight when no time is given. */
-    private LocalDateTime parseDateTime(String dateTime) {
-        String input = dateTime.trim();
-        if (!input.contains(" ")) {
-            input += " 0000";
+    private LocalDateTime parseDateTime(String dateTimeText) {
+        String normalizedDateTime = dateTimeText.trim();
+        if (!normalizedDateTime.contains(" ")) {
+            normalizedDateTime += " 0000";
         }
-        return LocalDateTime.parse(input, DATE_TIME_FORMAT);
+        return LocalDateTime.parse(normalizedDateTime, DATE_TIME_FORMAT);
     }
 
     /** Finds tasks whose descriptions contain the supplied keyword. */
@@ -152,18 +158,18 @@ public class TaskCommandHandler {
             ui.printFindUsage();
             return;
         }
-        taskInputs.printTasksContaining(keyword);
+        taskList.printTasksContaining(keyword);
     }
 
     /** Changes the completion state of the task at the supplied user-facing task number. */
-    private void changeTaskCompletion(String parameters, boolean isComplete) {
-        String command = isComplete ? "mark" : "unmark";
+    private void changeTaskCompletion(String parameters, boolean shouldMarkAsCompleted) {
+        String command = shouldMarkAsCompleted ? "mark" : "unmark";
         try {
             int taskNumber = Integer.parseInt(parameters);
-            if (isComplete) {
-                taskInputs.complete(taskNumber);
+            if (shouldMarkAsCompleted) {
+                taskList.markTaskAsCompleted(taskNumber);
             } else {
-                taskInputs.uncomplete(taskNumber);
+                taskList.markTaskAsIncomplete(taskNumber);
             }
         } catch (NumberFormatException exception) {
             ui.printTaskNumberError(command);
@@ -173,7 +179,7 @@ public class TaskCommandHandler {
     /** Deletes the task at the supplied user-facing task number. */
     private void deleteTask(String parameters) {
         try {
-            taskInputs.delete(Integer.parseInt(parameters));
+            taskList.deleteTask(Integer.parseInt(parameters));
         } catch (NumberFormatException exception) {
             ui.printTaskNumberError("delete");
         }

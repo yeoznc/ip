@@ -15,11 +15,11 @@ public class Deadline extends Task {
     /**
      * Creates a deadline task.
      *
-     * @param name The description of the task.
+     * @param description The description of the task.
      * @param deadline The date and time by which the task must be completed.
      */
-    public Deadline(String name, LocalDateTime deadline) {
-        super(name);
+    public Deadline(String description, LocalDateTime deadline) {
+        super(description);
         assert deadline != null : "Deadline date and time must not be null";
         this.deadline = deadline;
     }

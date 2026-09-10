@@ -17,14 +17,16 @@ public class Event extends Task {
     /**
      * Creates an event task.
      *
-     * @param name The description of the event.
+     * @param description The description of the event.
      * @param start The date and time when the event starts.
      * @param end The date and time when the event ends.
      */
-    public Event(String name, LocalDateTime start, LocalDateTime end) {
-        super(name);
+    public Event(String description, LocalDateTime start, LocalDateTime end) {
+        super(description);
         assert start != null && end != null : "Event start and end must not be null";
-        assert !end.isBefore(start) : "Event end must not be before its start";
+        if (end.isBefore(start)) {
+            throw new IllegalArgumentException("Event end must not be before its start");
+        }
         this.start = start;
         this.end = end;
     }

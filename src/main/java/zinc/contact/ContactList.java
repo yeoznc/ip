@@ -8,16 +8,16 @@ import zinc.ui.Ui;
 /**
  * Maintains and persists the user's contacts.
  */
-public class InputList {
+public class ContactList {
     /** The stored contacts. */
     private final List<Contact> contacts = new ArrayList<>();
 
     /** The component responsible for persisting contacts. */
-    private final Storage storage = new Storage();
+    private final ContactStorage contactStorage = new ContactStorage();
 
     /** Creates a contact list and restores contacts saved by a previous run. */
-    public InputList() {
-        contacts.addAll(storage.loadContacts());
+    public ContactList() {
+        contacts.addAll(contactStorage.loadContacts());
     }
 
     /**
@@ -78,7 +78,7 @@ public class InputList {
                 ? existingContact.getPhoneNumber() : updatedPhoneNumber;
         String replacementDescription = updatedDescription == null
                 ? existingContact.getDescription() : updatedDescription;
-        Contact updatedContact = existingContact.update(replacementName, replacementPhoneNumber,
+        Contact updatedContact = existingContact.withUpdatedDetails(replacementName, replacementPhoneNumber,
                 replacementDescription);
         contacts.set(contactIndex, updatedContact);
         saveContacts();
@@ -97,25 +97,24 @@ public class InputList {
         return new ArrayList<>(contacts);
     }
 
-    /**
-     * Prints all contacts currently stored.
-     * */
+    /** Prints all contacts currently stored. */
     public void printContacts() {
         if (contacts.isEmpty()) {
             System.out.println("You have no contacts :(\n");
             return;
         }
-        contacts.forEach(x -> System.out.println(x));
+        contacts.forEach(System.out::println);
     }
 
     /**
-     * Prints all contacts with matching names
-     * .
-     * @param keyword The keyword to search for among contact names.
+     * Prints all contacts whose names exactly match the supplied name.
+     *
+     * @param name The exact, case-sensitive name to match.
      */
-    public void listContactsWithName(String keyword) {
-        contacts.stream().filter(x -> x.getName().equals(keyword))
-                .forEach(x -> System.out.println(x));
+    public void printContactsNamed(String name) {
+        contacts.stream()
+                .filter(contact -> contact.getName().equals(name))
+                .forEach(System.out::println);
     }
     /**
      * Returns the number of stored contacts.
@@ -138,6 +137,6 @@ public class InputList {
 
     /** Saves the current contact list. */
     private void saveContacts() {
-        storage.saveContacts(contacts);
+        contactStorage.saveContacts(contacts);
     }
 }
