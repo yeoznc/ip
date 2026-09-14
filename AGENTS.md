@@ -62,3 +62,6 @@ All Java production code must follow the project skill
 `.github/skills/seedu-other-coding-standards/SKILL.md`, based on the
 [Other Coding Guidelines](https://nus-cs2103-ay2627-s1.github.io/website/schedule/week5/topics.html#w5-4-code-quality-readability-unsafe-practices-code-comments).
 Apply it to new code and when modifying existing code.
+
+## Zinc Personality
+Zinc should make rock and roll references and maintain a light and friendly disposition

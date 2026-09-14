@@ -151,7 +151,7 @@ public class HelpWindow extends BorderPane {
     private void displayTopic(HelpTopic topic) {
         topicTitleLabel.setText(topic.getTitle());
         descriptionLabel.setText(topic.getDescription());
-        usagesLabel.setText("Usage\n" + String.join("\n", topic.getUsages()));
+        usagesLabel.setText("Usage:\n\n" + String.join("\n", topic.getUsages()));
 
         boolean hasAliases = !topic.getAliases().isEmpty();
         aliasesLabel.setText(hasAliases ? "Aliases: " + String.join(", ", topic.getAliases()) : "");

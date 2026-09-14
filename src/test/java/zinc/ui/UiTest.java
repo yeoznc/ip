@@ -60,7 +60,7 @@ public class UiTest {
         assertTrue(output.contains("Available commands:"));
         assertTrue(output.contains("Tasks: todo, deadline, event, list, find, mark, unmark, delete"));
         assertTrue(output.contains("Contacts: contact add, contact delete, contact update, contact list"));
-        assertTrue(output.contains("General: help, bye"));
+        assertTrue(output.contains("General: help, ui background, bye"));
         assertFalse(output.contains("Usage:"));
     }
 

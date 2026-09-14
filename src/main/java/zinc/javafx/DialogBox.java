@@ -21,6 +21,12 @@ import javafx.scene.layout.HBox;
  * and a label containing text from the speaker.
  */
 public class DialogBox extends HBox {
+    /** The style applied to messages written by the user. */
+    private static final String USER_MESSAGE_STYLE = "user-message";
+
+    /** The style applied to messages written by Zinc. */
+    private static final String ZINC_MESSAGE_STYLE = "zinc-message";
+
     /** The label containing the message text. */
     @FXML
     private Label messageLabel;
@@ -35,7 +41,7 @@ public class DialogBox extends HBox {
      * @param text The message to display.
      * @param image The image representing the speaker.
      */
-    private DialogBox(String text, Image image) {
+    private DialogBox(String text, Image image, String messageStyle) {
         try {
             URL layoutUrl = Objects.requireNonNull(MainWindow.class.getResource("/view/DialogBox.fxml"),
                     "Dialog-box layout is missing");
@@ -48,6 +54,7 @@ public class DialogBox extends HBox {
         }
 
         messageLabel.setText(text);
+        messageLabel.getStyleClass().add(messageStyle);
         displayPicture.setImage(image);
     }
 
@@ -69,7 +76,7 @@ public class DialogBox extends HBox {
      * @return The user-aligned dialog box.
      */
     public static DialogBox createUserDialog(String text, Image image) {
-        return new DialogBox(text, image);
+        return new DialogBox(text, image, USER_MESSAGE_STYLE);
     }
 
     /**
@@ -80,7 +87,7 @@ public class DialogBox extends HBox {
      * @return The Zinc-aligned dialog box.
      */
     public static DialogBox createZincDialog(String text, Image image) {
-        DialogBox dialogBox = new DialogBox(text, image);
+        DialogBox dialogBox = new DialogBox(text, image, ZINC_MESSAGE_STYLE);
         dialogBox.alignForZinc();
         return dialogBox;
     }

@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 import zinc.contact.ContactList;
 import zinc.task.TaskList;
+import zinc.ui.BackgroundType;
 import zinc.ui.CommandParser;
 import zinc.ui.Ui;
 
@@ -106,6 +107,11 @@ public class Zinc {
      */
     public List<String> getStartupWarnings() {
         return startupWarnings;
+    }
+
+    /** Returns the background selection currently used by the graphical interface. */
+    public BackgroundType getBackgroundType() {
+        return ui.getBackgroundType();
     }
 
     /** Creates the warnings for data corruption detected during construction. */

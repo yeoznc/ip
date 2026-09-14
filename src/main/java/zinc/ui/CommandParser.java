@@ -23,11 +23,17 @@ public class CommandParser {
     /** The short contact-command alias. */
     private static final String CONTACT_COMMAND_ALIAS = "ct";
 
+    /** The command that configures the user interface. */
+    private static final String UI_COMMAND = "ui";
+
     /** The handler for commands that operate on tasks. */
     private final TaskCommandHandler taskCommandHandler;
 
     /** The handler for commands that operate on contacts. */
     private final ContactCommandHandler contactCommandHandler;
+
+    /** The handler for commands that configure the user interface. */
+    private final UiCommandHandler uiCommandHandler;
 
     /** The UI used to display general command messages. */
     private final Ui ui;
@@ -73,6 +79,7 @@ public class CommandParser {
                 : "Command-parser dependencies must not be null";
         this.taskCommandHandler = new TaskCommandHandler(taskList, ui);
         this.contactCommandHandler = new ContactCommandHandler(contactList, ui);
+        this.uiCommandHandler = new UiCommandHandler(ui);
         this.ui = ui;
     }
 
@@ -102,6 +109,10 @@ public class CommandParser {
         }
         if (command.equals(CONTACT_COMMAND) || command.equals(CONTACT_COMMAND_ALIAS)) {
             contactCommandHandler.execute(parameters);
+            return false;
+        }
+        if (command.equals(UI_COMMAND)) {
+            uiCommandHandler.execute(parameters);
             return false;
         }
         if (taskCommandHandler.execute(command, parameters)) {

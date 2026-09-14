@@ -52,6 +52,9 @@ public final class HelpContent {
             new HelpTopic(HelpCategory.GENERAL, "Help", "help",
                     "Shows the commands available in Zinc.",
                     List.of("help"), List.of()),
+            new HelpTopic(HelpCategory.GENERAL, "Set background", "ui background",
+                    "Changes the window background or restores automatic time-based selection.",
+                    List.of("ui background <morning|evening|night|auto>"), List.of("ui bg")),
             new HelpTopic(HelpCategory.GENERAL, "Exit", "bye",
                     "Exits Zinc.",
                     List.of("bye"), List.of()));

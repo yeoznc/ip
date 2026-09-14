@@ -15,7 +15,7 @@ public class HelpContentTest {
     public void getTopics_allTopics_haveRequiredDetails() {
         List<HelpTopic> topics = HelpContent.getTopics();
 
-        assertEquals(14, topics.size());
+        assertEquals(15, topics.size());
         assertTrue(topics.stream().allMatch(topic -> !topic.getTitle().isBlank()));
         assertTrue(topics.stream().allMatch(topic -> !topic.getCommand().isBlank()));
         assertTrue(topics.stream().allMatch(topic -> !topic.getDescription().isBlank()));

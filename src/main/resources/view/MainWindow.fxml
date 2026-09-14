@@ -20,6 +20,7 @@
     <left>
         <VBox
                 prefWidth="200.0"
+                fx:id="sidebar"
                 styleClass="sidebar">
 
             <Button
@@ -39,7 +40,9 @@
     </left>
 
     <center>
-        <BorderPane styleClass="chat-pane">
+        <BorderPane
+                fx:id="chatPane"
+                styleClass="chat-pane">
             <top>
                 <HBox
                         alignment="CENTER_LEFT"
@@ -82,6 +85,10 @@
                                 onAction="#showContactList"
                                 styleClass="quickCommand"
                                 text="Contact List" />
+                        <Button
+                                onAction="#showTaskList"
+                                styleClass="quickCommand"
+                                text="Task List"/>
                     </HBox>
 
                     <HBox

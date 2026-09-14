@@ -2,9 +2,10 @@ package zinc.ui;
 
 /** Categories used to organize Zinc's command reference. */
 public enum HelpCategory {
+    GENERAL("General"),
     TASKS("Tasks"),
-    CONTACTS("Contacts"),
-    GENERAL("General");
+    CONTACTS("Contacts");
+
 
     /** The category name displayed to users. */
     private final String displayName;
