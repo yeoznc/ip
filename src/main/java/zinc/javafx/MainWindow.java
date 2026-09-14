@@ -56,23 +56,23 @@ public class MainWindow extends AnchorPane {
     private Zinc zinc;
 
     /**
-     * Initializes the center pane and prints a greeting.
+     * Initializes the center pane.
      */
     @FXML
     public void initialize() {
         dialogContainer.heightProperty().addListener((ignoredObservable, ignoredOldHeight, ignoredNewHeight) -> {
             Platform.runLater(() -> scrollPane.setVvalue(BOTTOM_SCROLL_POSITION));
         });
-        appendZincDialog("Hi, I’m Zinc. What should we do today?");
     }
 
     /**
-     * Injects the Zinc instance.
+     * Injects the Zinc instance and displays its startup message.
      *
      * @param zincInstance The application instance used to process commands.
      */
     public void setZinc(Zinc zincInstance) {
         zinc = zincInstance;
+        appendZincDialog(zinc.getGreetingResponse());
     }
 
     /**
@@ -82,6 +82,11 @@ public class MainWindow extends AnchorPane {
     private void handleUserInput() {
         String input = userInput.getText();
         if (input == null || input.isBlank()) {
+            return;
+        }
+        if (isHelpCommand(input)) {
+            userInput.clear();
+            showHelp();
             return;
         }
         if (input.equals(EXIT_COMMAND)) {
@@ -99,7 +104,7 @@ public class MainWindow extends AnchorPane {
     /** Displays Zinc's command reference. */
     @FXML
     private void showHelp() {
-        appendZincDialog(zinc.processCommand(HELP_COMMAND));
+        new HelpWindow().show(userInput.getScene().getWindow());
     }
 
     /** Displays every saved contact. */
@@ -112,13 +117,13 @@ public class MainWindow extends AnchorPane {
     @FXML
     private void startNewConversation() {
         dialogContainer.getChildren().clear();
-        appendZincDialog("What's on your mind?");
+        appendZincDialog(zinc.getConversationPromptResponse());
     }
 
     /** Displays a goodbye message and exits after a short delay. */
     @FXML
     private void exitProgram() {
-        appendZincDialog("Goodbye");
+        appendZincDialog(zinc.getGoodbyeResponse());
 
         PauseTransition exitPause = new PauseTransition(EXIT_DELAY);
         exitPause.setOnFinished(ignoredEvent -> Platform.exit());
@@ -128,6 +133,16 @@ public class MainWindow extends AnchorPane {
     /** Adds a Zinc-authored message to the conversation. */
     private void appendZincDialog(String message) {
         dialogContainer.getChildren().add(DialogBox.createZincDialog(message, zincImage));
+    }
+
+    /** Returns whether the supplied input uses the help command word. */
+    static boolean isHelpCommand(String input) {
+        assert input != null : "Command input must not be null";
+        String trimmedInput = input.trim();
+        if (trimmedInput.isEmpty()) {
+            return false;
+        }
+        return trimmedInput.split("\\s+", 2)[0].equals(HELP_COMMAND);
     }
 
     /** Loads an image resource required by the main window. */

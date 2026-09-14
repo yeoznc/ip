@@ -1,5 +1,7 @@
 package zinc.ui;
 
+import java.util.List;
+
 import zinc.contact.ContactCommandHandler;
 import zinc.contact.ContactList;
 import zinc.task.TaskCommandHandler;
@@ -52,8 +54,8 @@ public class CommandParser {
     /**
      * Creates a parser that updates the supplied task and contact lists.
      *
-     * @param taskInputs The task list to update.
-     * @param contactInputs The contact list to update.
+     * @param taskList The task list to update.
+     * @param contactList The contact list to update.
      */
     public CommandParser(TaskList taskList, ContactList contactList) {
         this(taskList, contactList, new Ui());
@@ -62,8 +64,8 @@ public class CommandParser {
     /**
      * Creates a parser using the supplied task list, contact list, and UI.
      *
-     * @param taskInputs The task list to update.
-     * @param contactInputs The contact list to update.
+     * @param taskList The task list to update.
+     * @param contactList The contact list to update.
      * @param ui The UI used to display user-facing messages.
      */
     public CommandParser(TaskList taskList, ContactList contactList, Ui ui) {
@@ -112,17 +114,9 @@ public class CommandParser {
 
     /** Prints either similar command names or the unknown-command message. */
     private void printUnknownCommand(String command) {
-        StringBuilder otherCommands = new StringBuilder();
-        for (String commandName : ui.getCommands()) {
-            if (commandName.startsWith(command)) {
-                otherCommands.append(commandName).append(" ");
-            }
-        }
-        if (otherCommands.isEmpty()) {
-            System.out.println("Sorry, I don't know what you mean. Type help for a list of available commands\n");
-        } else {
-            System.out.println("Did you mean: " + otherCommands);
-            System.out.println("Type help for a list of available commands");
-        }
+        List<String> suggestedCommands = ui.getCommands().stream()
+                .filter(commandName -> commandName.startsWith(command))
+                .toList();
+        ui.printUnknownCommand(suggestedCommands);
     }
 }

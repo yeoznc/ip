@@ -103,3 +103,70 @@
     -fx-padding: 7 13;
     -fx-font-size: 11px;
 }
+
+/* Command browser */
+.help-window {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #f8f9fd;
+}
+
+.help-header {
+    -fx-padding: 24 28 18 28;
+    -fx-border-color: transparent transparent #e1e3ed transparent;
+}
+
+.help-heading {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #24263a;
+}
+
+.help-subheading {
+    -fx-text-fill: #66697a;
+}
+
+.help-content {
+    -fx-background-color: transparent;
+    -fx-padding: 18 28 18 28;
+}
+
+.help-command-tree {
+    -fx-background-color: white;
+    -fx-border-color: #e1e3ed;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.help-detail-scroll,
+.help-detail-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.help-detail {
+    -fx-padding: 8 18 18 24;
+}
+
+.help-topic-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #24263a;
+}
+
+.help-usage {
+    -fx-font-family: "Consolas";
+    -fx-background-color: #eeeffb;
+    -fx-background-radius: 8;
+    -fx-padding: 14;
+    -fx-text-fill: #453c9e;
+}
+
+.help-footer {
+    -fx-padding: 12 28 20 28;
+}
+
+.help-footer .button {
+    -fx-background-color: #7667f5;
+    -fx-background-radius: 8;
+    -fx-padding: 8 20;
+    -fx-text-fill: white;
+}
