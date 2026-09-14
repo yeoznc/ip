@@ -2,23 +2,68 @@ package zinc.javafx;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalTime;
 import java.util.Objects;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import zinc.Zinc;
+import zinc.ui.BackgroundType;
 
 /**
  * Controller for the main GUI.
  */
 public class MainWindow extends AnchorPane {
+    /** The start of the daytime background period. */
+    private static final LocalTime DAY_START_TIME = LocalTime.of(6, 0);
+
+    /** The start of the evening background period. */
+    private static final LocalTime EVENING_START_TIME = LocalTime.of(18, 0);
+
+    /** The start of the nighttime background period. */
+    private static final LocalTime NIGHT_START_TIME = LocalTime.of(22, 0);
+
+    /** The background used during the daytime period. */
+    private static final String DAY_BACKGROUND_STYLE_CLASS = "background-morning";
+
+    /** The background used during the evening period. */
+    private static final String EVENING_BACKGROUND_STYLE_CLASS = "background-sunset";
+
+    /** The background used during the nighttime period. */
+    private static final String NIGHT_BACKGROUND_STYLE_CLASS = "background-night";
+
+    /** The sidebar style class used during the daytime period. */
+    private static final String DAY_SIDEBAR_STYLE_CLASS = "sidebar-morning";
+
+    /** The sidebar style class used during the evening period. */
+    private static final String EVENING_SIDEBAR_STYLE_CLASS = "sidebar-sunset";
+
+    /** The sidebar style class used during the nighttime period. */
+    private static final String NIGHT_SIDEBAR_STYLE_CLASS = "sidebar-night";
+
+    /** The CSS classes managed when the background changes. */
+    private static final String[] BACKGROUND_STYLE_CLASSES = {
+        "background-morning",
+        "background-sunset",
+        "background-night"
+    };
+
+    /** The sidebar style classes managed when the background changes. */
+    private static final String[] SIDEBAR_STYLE_CLASSES = {
+        DAY_SIDEBAR_STYLE_CLASS,
+        EVENING_SIDEBAR_STYLE_CLASS,
+        NIGHT_SIDEBAR_STYLE_CLASS
+    };
+
     /** The delay before Zinc exits after displaying its goodbye message. */
     private static final Duration EXIT_DELAY = Duration.seconds(2);
 
@@ -30,6 +75,9 @@ public class MainWindow extends AnchorPane {
 
     /** The command that displays every saved contact. */
     private static final String LIST_CONTACTS_COMMAND = "ct ls";
+
+    /** The command that displays every saved task. */
+    private static final String LIST_TASK_COMMAND = "ls";
 
     /** The scroll position representing the bottom of the conversation. */
     private static final double BOTTOM_SCROLL_POSITION = 1.0;
@@ -48,6 +96,14 @@ public class MainWindow extends AnchorPane {
     @FXML
     private VBox dialogContainer;
 
+    /** The navigation panel whose colour follows the active background. */
+    @FXML
+    private VBox sidebar;
+
+    /** The pane behind the conversation and its controls. */
+    @FXML
+    private BorderPane chatPane;
+
     /** The field in which the user enters commands. */
     @FXML
     private TextField userInput;
@@ -63,6 +119,46 @@ public class MainWindow extends AnchorPane {
         dialogContainer.heightProperty().addListener((ignoredObservable, ignoredOldHeight, ignoredNewHeight) -> {
             Platform.runLater(() -> scrollPane.setVvalue(BOTTOM_SCROLL_POSITION));
         });
+        applyCurrentBackground();
+        chatPane.sceneProperty().addListener((ignoredObservable, ignoredOldScene, newScene) ->
+                observeWindowFocus(newScene));
+    }
+
+    /** Refreshes the background selection using the current local time. */
+    private void applyCurrentBackground() {
+        LocalTime currentTime = LocalTime.now();
+        BackgroundType selectedBackgroundType = zinc == null ? BackgroundType.AUTO : zinc.getBackgroundType();
+        String backgroundStyleClass = getBackgroundStyleClass(currentTime, selectedBackgroundType);
+        String sidebarStyleClass = getSidebarStyleClass(backgroundStyleClass);
+        chatPane.getStyleClass().removeAll(BACKGROUND_STYLE_CLASSES);
+        chatPane.getStyleClass().add(backgroundStyleClass);
+        sidebar.getStyleClass().removeAll(SIDEBAR_STYLE_CLASSES);
+        sidebar.getStyleClass().add(sidebarStyleClass);
+    }
+
+    /** Re-evaluates the background whenever the main window regains focus. */
+    private void observeWindowFocus(Scene scene) {
+        if (scene == null) {
+            return;
+        }
+
+        scene.windowProperty().addListener((ignoredObservable, ignoredOldWindow, newWindow) -> {
+            if (newWindow != null) {
+                newWindow.focusedProperty().addListener((ignoredFocusObservable, ignoredWasFocused, isFocused) -> {
+                    if (isFocused) {
+                        applyCurrentBackground();
+                    }
+                });
+            }
+        });
+
+        if (scene.getWindow() != null) {
+            scene.getWindow().focusedProperty().addListener((ignoredObservable, ignoredWasFocused, isFocused) -> {
+                if (isFocused) {
+                    applyCurrentBackground();
+                }
+            });
+        }
     }
 
     /**
@@ -84,21 +180,22 @@ public class MainWindow extends AnchorPane {
         if (input == null || input.isBlank()) {
             return;
         }
+
+        appendUserDialog(input);
+        userInput.clear();
+
         if (isHelpCommand(input)) {
-            userInput.clear();
             showHelp();
             return;
         }
         if (input.equals(EXIT_COMMAND)) {
             exitProgram();
-            userInput.clear();
             return;
         }
+
         String response = zinc.processCommand(input);
-        dialogContainer.getChildren().addAll(
-                DialogBox.createUserDialog(input, userImage),
-                DialogBox.createZincDialog(response, zincImage));
-        userInput.clear();
+        appendZincDialog(response);
+        applyCurrentBackground();
     }
 
     /** Displays Zinc's command reference. */
@@ -111,6 +208,12 @@ public class MainWindow extends AnchorPane {
     @FXML
     private void showContactList() {
         appendZincDialog(zinc.processCommand(LIST_CONTACTS_COMMAND));
+    }
+
+    /** Displays every saved task. */
+    @FXML
+    private void showTaskList() {
+        appendZincDialog(zinc.processCommand(LIST_TASK_COMMAND));
     }
 
     /** Clears the conversation and displays a fresh prompt. */
@@ -133,6 +236,60 @@ public class MainWindow extends AnchorPane {
     /** Adds a Zinc-authored message to the conversation. */
     private void appendZincDialog(String message) {
         dialogContainer.getChildren().add(DialogBox.createZincDialog(message, zincImage));
+    }
+
+    /** Adds a user-authored message to the conversation. */
+    private void appendUserDialog(String message) {
+        dialogContainer.getChildren().add(DialogBox.createUserDialog(message, userImage));
+    }
+
+    /** Returns the CSS background class for a supplied local time. */
+    static String getBackgroundStyleClass(LocalTime time) {
+        assert time != null : "Time must not be null";
+
+        if (time.isAfter(DAY_START_TIME) && time.isBefore(EVENING_START_TIME)) {
+            return DAY_BACKGROUND_STYLE_CLASS;
+        }
+        if (time.isAfter(EVENING_START_TIME) && time.isBefore(NIGHT_START_TIME)) {
+            return EVENING_BACKGROUND_STYLE_CLASS;
+        }
+        return NIGHT_BACKGROUND_STYLE_CLASS;
+    }
+
+    /** Returns the background CSS class for the selected mode and current time. */
+    static String getBackgroundStyleClass(LocalTime time, BackgroundType selectedBackgroundType) {
+        assert time != null && selectedBackgroundType != null : "Background inputs must not be null";
+        if (selectedBackgroundType == BackgroundType.AUTO) {
+            return getBackgroundStyleClass(time);
+        }
+        return switch (selectedBackgroundType) {
+            case MORNING -> DAY_BACKGROUND_STYLE_CLASS;
+            case EVENING -> EVENING_BACKGROUND_STYLE_CLASS;
+            case NIGHT -> NIGHT_BACKGROUND_STYLE_CLASS;
+            case AUTO -> throw new IllegalStateException("Automatic background should be handled earlier");
+        };
+    }
+
+    /** Returns the sidebar CSS class for a supplied local time. */
+    static String getSidebarStyleClass(LocalTime time) {
+        assert time != null : "Time must not be null";
+
+        return switch (getBackgroundStyleClass(time)) {
+            case DAY_BACKGROUND_STYLE_CLASS -> DAY_SIDEBAR_STYLE_CLASS;
+            case EVENING_BACKGROUND_STYLE_CLASS -> EVENING_SIDEBAR_STYLE_CLASS;
+            case NIGHT_BACKGROUND_STYLE_CLASS -> NIGHT_SIDEBAR_STYLE_CLASS;
+            default -> throw new IllegalStateException("Unknown background style class");
+        };
+    }
+
+    /** Returns the sidebar CSS class matching a background CSS class. */
+    private static String getSidebarStyleClass(String backgroundStyleClass) {
+        return switch (backgroundStyleClass) {
+            case DAY_BACKGROUND_STYLE_CLASS -> DAY_SIDEBAR_STYLE_CLASS;
+            case EVENING_BACKGROUND_STYLE_CLASS -> EVENING_SIDEBAR_STYLE_CLASS;
+            case NIGHT_BACKGROUND_STYLE_CLASS -> NIGHT_SIDEBAR_STYLE_CLASS;
+            default -> throw new IllegalStateException("Unknown background style class");
+        };
     }
 
     /** Returns whether the supplied input uses the help command word. */

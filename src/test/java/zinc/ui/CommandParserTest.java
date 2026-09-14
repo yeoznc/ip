@@ -221,4 +221,39 @@ public class CommandParserTest {
 
         assertEquals(0, contactList.getContactCount());
     }
+
+    @Test
+    public void parseCommand_uiBackgroundAliases_selectBackground() {
+        Ui ui = new Ui();
+        CommandParser commandParser = new CommandParser(new TaskList(), new zinc.contact.ContactList(), ui);
+
+        commandParser.parseCommand("ui background morning");
+        assertEquals(BackgroundType.MORNING, ui.getBackgroundType());
+
+        commandParser.parseCommand("ui bg night");
+        assertEquals(BackgroundType.NIGHT, ui.getBackgroundType());
+    }
+
+    @Test
+    public void parseCommand_uiBackgroundAuto_restoresAutomaticSelection() {
+        Ui ui = new Ui();
+        CommandParser commandParser = new CommandParser(new TaskList(), new zinc.contact.ContactList(), ui);
+        commandParser.parseCommand("ui bg evening");
+
+        commandParser.parseCommand("ui bg auto");
+
+        assertEquals(BackgroundType.AUTO, ui.getBackgroundType());
+    }
+
+    @Test
+    public void parseCommand_uiBackgroundWithInvalidArguments_keepsPreviousSelection() {
+        Ui ui = new Ui();
+        CommandParser commandParser = new CommandParser(new TaskList(), new zinc.contact.ContactList(), ui);
+        commandParser.parseCommand("ui bg morning");
+
+        commandParser.parseCommand("ui background dawn");
+        commandParser.parseCommand("ui background night extra");
+
+        assertEquals(BackgroundType.MORNING, ui.getBackgroundType());
+    }
 }

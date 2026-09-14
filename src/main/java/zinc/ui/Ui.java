@@ -40,10 +40,13 @@ public class Ui {
     /** All commands currently supported by Zinc, in alphabetical order. */
     private static final List<String> SUPPORTED_COMMANDS = List.of(
             "bye", "contact", "deadline", "delete", "event", "find", "help", "list", "mark", "todo",
-            "unmark");
+            "ui", "unmark");
 
     /** The random source used to vary Zinc's responses. */
     private final RandomGenerator randomGenerator;
+
+    /** The background selection used by the graphical interface. */
+    private BackgroundType backgroundType = BackgroundType.AUTO;
 
     /** Creates a UI that chooses response variants using the default random generator. */
     public Ui() {
@@ -164,6 +167,17 @@ public class Ui {
         printError("Contact number must contain exactly 8 digits.");
     }
 
+    /** Prints the usage message for UI background commands. */
+    public void printUiUsage() {
+        printError("Usage: ui background <morning|evening|night|auto>");
+    }
+
+    /** Prints a confirmation after changing the UI background selection. */
+    public void printBackgroundChanged(BackgroundType selectedBackgroundType) {
+        assert selectedBackgroundType != null : "Background type must not be null";
+        printSuccess("Background changed to " + selectedBackgroundType.name().toLowerCase() + ".");
+    }
+
     /** Prints the invalid task-number message for the given command. */
     public void printTaskNumberError(String command) {
         printError("Task number must be an integer. Usage: " + command + " <task number>");
@@ -245,6 +259,17 @@ public class Ui {
      */
     public List<String> getCommands() {
         return SUPPORTED_COMMANDS;
+    }
+
+    /** Returns the background selection currently used by the graphical interface. */
+    public BackgroundType getBackgroundType() {
+        return backgroundType;
+    }
+
+    /** Updates the background selection used by the graphical interface. */
+    public void setBackgroundType(BackgroundType selectedBackgroundType) {
+        assert selectedBackgroundType != null : "Background type must not be null";
+        backgroundType = selectedBackgroundType;
     }
 
     /** Prints a successful result with a randomly selected introduction. */
