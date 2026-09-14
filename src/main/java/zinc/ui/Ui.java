@@ -1,71 +1,64 @@
 package zinc.ui;
 
 import java.util.List;
+import java.util.random.RandomGenerator;
 
-/**
- * Handles the user-facing presentation of Zinc.
- */
+/** Handles the user-facing presentation of Zinc. */
 public class Ui {
-    /** The horizontal separator used between sections of user-facing output. */
-    public static final String SEPARATOR = "_________________________________________";
+    /** Personality lines used before successful command results. */
+    private static final List<String> SUCCESS_INTRODUCTIONS = List.of(
+            "Rock on!", "Nice riff!", "Locked in and ready to rock!");
+
+    /** Personality lines used before lists and search results. */
+    private static final List<String> LIST_INTRODUCTIONS = List.of(
+            "Here comes the setlist!", "Your lineup is ready!", "Let's check the stage!");
+
+    /** Personality lines used before invalid-command and validation details. */
+    private static final List<String> ERROR_INTRODUCTIONS = List.of(
+            "That note was a little off.", "Let's tune that command.", "Small soundcheck needed.");
+
+    /** Messages used to greet the user. */
+    private static final List<String> GREETINGS = List.of(
+            "Hello, I'm Zinc. Ready to rock your tasks?",
+            "Zinc is plugged in! What shall we tackle?",
+            "Hello! Let's tune up your day together.");
+
+    /** Messages used to start a fresh GUI conversation. */
+    private static final List<String> CONVERSATION_PROMPTS = List.of(
+            "What's next on the setlist?", "Ready for another riff?", "What shall we rock through next?");
+
+    /** Messages used when the user exits Zinc. */
+    private static final List<String> GOODBYES = List.of(
+            "Goodbye. Keep rocking!", "Goodbye. Until the next encore!", "Goodbye. The stage is yours!");
+
+    /** Personality lines used before the command reference. */
+    private static final List<String> HELP_INTRODUCTIONS = List.of(
+            "Here's the command setlist:",
+            "Pick your next move from this lineup:",
+            "These commands are ready to rock:");
 
     /** All commands currently supported by Zinc, in alphabetical order. */
     private static final List<String> SUPPORTED_COMMANDS = List.of(
-            "bye",
-            "contact",
-            "deadline",
-            "delete",
-            "event",
-            "find",
-            "help",
-            "list",
-            "mark",
-            "todo",
+            "bye", "contact", "deadline", "delete", "event", "find", "help", "list", "mark", "todo",
             "unmark");
 
-    /** Instructions displayed by the help command. */
-    private static final String HELP_MESSAGE = """
-            Available commands:
-            bye
-            \tExits
-            contact add (Alternative: ct add)
-            \tAdds a contact; the contact number and description are optional
-            \tUsage: contact add /n <name> [/p <8-digit contact number>] [/d <description>]
-            contact delete (or contact del)
-            \tDeletes a contact using its name
-            \tUsage: contact del /n <name>
-            contact update
-            \tUpdates one or more fields of a contact
-            \tUsage: contact update <current name> [/n <new name>] [/p <8-digit contact number>] [/d <description>]
-            deadline
-            \tAdds a Deadline task
-            \tUsage: deadline <description> /by <DD/MM/YY Optional[HH:MM]>
-            delete
-            \tDeletes a task
-            \tUsage: delete <task number>
-            event
-            \tAdds an Event task
-            \tUsage: event <description> /from <DD/MM/YY Optional[HH:MM]> /to <DD/MM/YY Optional[HH:MM]>
-            find
-            \tFinds tasks whose descriptions contain a keyword
-            \tUsage: find <keyword>
-            help
-            \tShows this help list
-            \tUsage: help
-            list
-            \tLists all added tasks
-            \tUsage: list
-            \tUsage: list <DD/MM/YY> to list deadlines and events ending that day
-            mark
-            \tMarks task as done
-            \tUsage: mark <task number>
-            todo
-            \tAdds a ToDo task
-            \tUsage: todo <description>
-            unmark
-            \tMarks task as undone
-            \tUsage: unmark <task number>
-            """;
+    /** The random source used to vary Zinc's responses. */
+    private final RandomGenerator randomGenerator;
+
+    /** Creates a UI that chooses response variants using the default random generator. */
+    public Ui() {
+        this(RandomGenerator.getDefault());
+    }
+
+    /**
+     * Creates a UI that uses a supplied random generator.
+     *
+     * @param randomGenerator The source used to choose response variants.
+     */
+    Ui(RandomGenerator randomGenerator) {
+        assert randomGenerator != null : "Random generator must not be null";
+        this.randomGenerator = randomGenerator;
+    }
 
     /** Prints the Zinc banner. */
     public void printBanner() {
@@ -78,85 +71,171 @@ public class Ui {
         System.out.println(banner);
     }
 
-    /** Prints the opening greeting. */
+    /** Prints a randomly selected opening greeting. */
     public void printGreeting() {
-        System.out.println("Hello, my name's Zinc.\n"
-                + "What can I do for you?\n"
-                + SEPARATOR);
+        System.out.println(getGreetingMessage() + "\n");
     }
 
-    /** Prints the currently supported commands and their usage. */
+    /**
+     * Returns a randomly selected opening greeting.
+     *
+     * @return A friendly greeting.
+     */
+    public String getGreetingMessage() {
+        return selectResponse(GREETINGS);
+    }
+
+    /**
+     * Returns a randomly selected prompt for a fresh conversation.
+     *
+     * @return A friendly conversation prompt.
+     */
+    public String getConversationPrompt() {
+        return selectResponse(CONVERSATION_PROMPTS);
+    }
+
+    /**
+     * Returns a randomly selected closing message.
+     *
+     * @return A friendly goodbye message.
+     */
+    public String getGoodbyeMessage() {
+        return selectResponse(GOODBYES);
+    }
+
+    /** Prints a compact overview of the currently supported commands. */
     public void printHelp() {
-        System.out.println(HELP_MESSAGE);
+        System.out.println(selectResponse(HELP_INTRODUCTIONS) + "\n" + HelpContent.getCompactOverview());
     }
 
     /** Prints the usage message for an empty todo description. */
     public void printTodoUsage() {
-        System.out.println("The description of a todo cannot be empty.\n");
+        printError("The description of a todo cannot be empty.");
     }
 
     /** Prints the usage message for the deadline command. */
     public void printDeadlineUsage() {
-        System.out.println("Usage: deadline <description> /by <DD/MM/YY Optional[HH:MM]>\n");
+        printError("Usage: deadline <description> /by <DD/MM/YY Optional[HH:MM]>");
     }
 
     /** Prints the usage message for the event command. */
     public void printEventUsage() {
-        System.out.println("Usage: event <description> /from <DD/MM/YY Optional[HH:MM]>"
-                + " /to <DD/MM/YY Optional[HH:MM]>\n");
+        printError("Usage: event <description> /from <DD/MM/YY Optional[HH:MM]>"
+                + " /to <DD/MM/YY Optional[HH:MM]>");
     }
 
     /** Prints the message used when an event ends before it starts. */
     public void printEventChronologyError() {
-        System.out.println("An event cannot end before it starts.\n");
+        printError("An event cannot end before it starts.");
     }
 
     /** Prints the message used when the task list has reached its capacity. */
     public void printTaskListFull() {
-        System.out.println("The task list is full. Delete a task before adding another.\n");
+        printError("The task list is full. Delete a task before adding another.");
     }
 
     /** Prints the invalid date/time message. */
     public void printDateTimeError() {
-        System.out.println("Date and time must use DD/MM/YY Optional[HH:MM].\n");
+        printError("Date and time must use DD/MM/YY Optional[HH:MM].");
     }
 
     /** Prints the usage message for the list date filter. */
     public void printListDateError() {
-        System.out.println("Date must use DD/MM/YY. Usage: list <DD/MM/YY>\n");
+        printError("Date must use DD/MM/YY. Usage: list <DD/MM/YY>");
     }
 
     /** Prints the usage message for the find command. */
     public void printFindUsage() {
-        System.out.println("Usage: find <keyword>\n");
+        printError("Usage: find <keyword>");
     }
 
     /** Prints the usage message for contact commands. */
     public void printContactUsage() {
-        System.out.println("Usage:\n"
+        printError("Usage:\n"
                 + "contact add /n <name> [/p <8-digit contact number>] [/d <description>]\n"
                 + "contact del /n <name>\n"
                 + "contact update <current name> [/n <new name>]"
                 + " [/p <8-digit contact number>] [/d <description>]\n"
-                + "contact list <keyword>\n");
+                + "contact list <keyword>");
     }
 
     /** Prints the message used when a contact number is invalid. */
     public void printContactNumberError() {
-        System.out.println("Contact number must contain exactly 8 digits.\n");
+        printError("Contact number must contain exactly 8 digits.");
     }
 
     /** Prints the invalid task-number message for the given command. */
     public void printTaskNumberError(String command) {
-        System.out.println("Task number must be an integer. Usage: " + command
-                + " <task number>\n");
+        printError("Task number must be an integer. Usage: " + command + " <task number>");
+    }
+
+    /** Prints a message stating that the selected task does not exist. */
+    public void printTaskNotFound() {
+        printError("No such task found.");
+    }
+
+    /** Prints a message stating that the named contact does not exist. */
+    public void printContactNotFound(String name) {
+        printError("No contact named \"" + name + "\" found.");
+    }
+
+    /** Prints either similar command names or the unknown-command message. */
+    public void printUnknownCommand(List<String> suggestedCommands) {
+        assert suggestedCommands != null : "Suggested commands must not be null";
+        if (suggestedCommands.isEmpty()) {
+            printError("I don't know that command. Type help for the command setlist.");
+            return;
+        }
+
+        printError("Did you mean: " + String.join(", ", suggestedCommands)
+                + "? Type help for the command setlist.");
+    }
+
+    /** Prints a newly added task and the updated task count. */
+    public void printTaskAdded(String taskDescription, int taskCount) {
+        printSuccess("Task added to list:\n" + taskDescription
+                + "\nYou have " + taskCount + " tasks in the list");
+    }
+
+    /** Prints task entries beneath a descriptive heading. */
+    public void printTaskList(String heading, List<String> taskEntries) {
+        printList(heading, taskEntries);
+    }
+
+    /** Prints a task whose completion state was changed. */
+    public void printTaskCompletionChanged(String actionDescription, String taskDescription) {
+        printSuccess("Task " + actionDescription + ":\n" + taskDescription);
+    }
+
+    /** Prints a deleted task and the updated task count. */
+    public void printTaskDeleted(String taskDescription, int taskCount) {
+        printSuccess("Task deleted:\n" + taskDescription
+                + "\nYou have " + taskCount + " tasks in the list");
+    }
+
+    /** Prints a newly added contact. */
+    public void printContactAdded(String contactDescription) {
+        printSuccess("Contact added:\n" + contactDescription);
+    }
+
+    /** Prints a deleted contact. */
+    public void printContactDeleted(String contactDescription) {
+        printSuccess("Contact deleted:\n" + contactDescription);
+    }
+
+    /** Prints an updated contact. */
+    public void printContactUpdated(String contactDescription) {
+        printSuccess("Contact updated:\n" + contactDescription);
+    }
+
+    /** Prints contact entries beneath a descriptive heading. */
+    public void printContactList(String heading, List<String> contactEntries) {
+        printList(heading, contactEntries);
     }
 
     /** Prints the closing message. */
     public void printGoodbye() {
-        System.out.println(SEPARATOR + "\n"
-                + "Goodbye.\n"
-                + SEPARATOR);
+        System.out.println("\n" + getGoodbyeMessage() + "\n");
     }
 
     /**
@@ -166,5 +245,38 @@ public class Ui {
      */
     public List<String> getCommands() {
         return SUPPORTED_COMMANDS;
+    }
+
+    /** Prints a successful result with a randomly selected introduction. */
+    private void printSuccess(String message) {
+        printSection(selectResponse(SUCCESS_INTRODUCTIONS) + "\n" + message);
+    }
+
+    /** Prints list content with a randomly selected introduction. */
+    private void printList(String heading, List<String> entries) {
+        assert heading != null && entries != null : "List output must not be null";
+        StringBuilder message = new StringBuilder(selectResponse(LIST_INTRODUCTIONS))
+                .append("\n")
+                .append(heading);
+        for (String entry : entries) {
+            message.append("\n").append(entry);
+        }
+        printSection(message.toString());
+    }
+
+    /** Prints a validation or command error with a randomly selected introduction. */
+    private void printError(String message) {
+        System.out.println(selectResponse(ERROR_INTRODUCTIONS) + "\n" + message + "\n");
+    }
+
+    /** Prints a message followed by a blank line. */
+    private void printSection(String message) {
+        System.out.println(message + "\n");
+    }
+
+    /** Selects one response from a non-empty collection. */
+    private String selectResponse(List<String> responses) {
+        assert responses != null && !responses.isEmpty() : "Response collection must not be empty";
+        return responses.get(randomGenerator.nextInt(responses.size()));
     }
 }

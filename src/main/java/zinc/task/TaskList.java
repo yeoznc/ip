@@ -24,14 +24,30 @@ public class TaskList {
     /** The component responsible for persisting the task list. */
     private final TaskStorage taskStorage = new TaskStorage();
 
+    /** Whether malformed task data was found while restoring saved tasks. */
+    private final boolean wasStoredDataCorrupted;
+
     /** The UI used to display task-list messages. */
-    private final Ui ui = new Ui();
+    private final Ui ui;
 
     /**
      * Creates a task list and restores tasks saved by a previous run.
      */
     public TaskList() {
-        for (Task task : taskStorage.loadTasks()) {
+        this(new Ui());
+    }
+
+    /**
+     * Creates a task list that displays messages through the supplied UI.
+     *
+     * @param ui The UI used to display task-list messages.
+     */
+    public TaskList(Ui ui) {
+        assert ui != null : "Task-list UI must not be null";
+        this.ui = ui;
+        List<Task> storedTasks = taskStorage.loadTasks();
+        wasStoredDataCorrupted = taskStorage.wasDataCorrupted();
+        for (Task task : storedTasks) {
             if (tasks.size() == MAX_TASKS) {
                 break;
             }
@@ -53,11 +69,7 @@ public class TaskList {
 
         tasks.add(task);
         saveTasks();
-        System.out.println(Ui.SEPARATOR + "\n"
-                + "Task added to list:\n"
-                + formatTask(task) + "\n"
-                + "You have " + tasks.size() + " tasks in the list\n"
-                + Ui.SEPARATOR + "\n");
+        ui.printTaskAdded(formatTask(task), tasks.size());
     }
 
     /**
@@ -92,14 +104,14 @@ public class TaskList {
 
     /** Prints tasks accepted by the supplied filter while preserving their original list numbers. */
     private void printMatchingTasks(String heading, Predicate<Task> taskFilter) {
-        System.out.println(Ui.SEPARATOR + "\n" + heading + "\n");
+        List<String> taskEntries = new ArrayList<>();
         for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.get(i);
             if (taskFilter.test(task)) {
-                System.out.println((i + 1) + ". " + formatTask(task));
+                taskEntries.add((i + 1) + ". " + formatTask(task));
             }
         }
-        System.out.println(Ui.SEPARATOR + "\n");
+        ui.printTaskList(heading, taskEntries);
     }
 
     /** Formats a task with its type identifier for list output. */
@@ -140,7 +152,7 @@ public class TaskList {
     /** Updates and displays the completion state of a user-selected task. */
     private void updateTaskCompletion(int taskNumber, boolean shouldMarkAsCompleted) {
         if (tasks.size() < taskNumber || taskNumber <= 0) {
-            System.out.println("No such task found\n");
+            ui.printTaskNotFound();
             return;
         }
 
@@ -152,10 +164,7 @@ public class TaskList {
         }
         saveTasks();
         String actionDescription = shouldMarkAsCompleted ? "marked as done" : "unmarked as done";
-        System.out.println(Ui.SEPARATOR + "\n"
-                + "Task " + actionDescription + ":\n"
-                + task
-                + "\n" + Ui.SEPARATOR + "\n");
+        ui.printTaskCompletionChanged(actionDescription, task.toString());
     }
 
     /**
@@ -167,18 +176,14 @@ public class TaskList {
         int listIndex = taskNumber - 1;
 
         if (listIndex < 0 || listIndex >= tasks.size()) {
-            System.out.println("No such task found\n");
+            ui.printTaskNotFound();
             return;
         }
 
         Task deletedTask = tasks.remove(listIndex);
         saveTasks();
 
-        System.out.println(Ui.SEPARATOR + "\n"
-                + "Task deleted:\n"
-                + deletedTask.getTaskType().getDisplayIdentifier() + deletedTask + "\n"
-                + "You have " + tasks.size() + " tasks in the list\n"
-                + Ui.SEPARATOR + "\n");
+        ui.printTaskDeleted(deletedTask.getTaskType().getDisplayIdentifier() + deletedTask, tasks.size());
     }
 
     /**
@@ -197,6 +202,15 @@ public class TaskList {
      */
     public int getTaskCount() {
         return tasks.size();
+    }
+
+    /**
+     * Returns whether malformed task data was found during construction.
+     *
+     * @return Whether the saved task data was corrupted.
+     */
+    public boolean wasStoredDataCorrupted() {
+        return wasStoredDataCorrupted;
     }
 
     /** Saves the current list after a task has been changed. */

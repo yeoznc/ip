@@ -28,6 +28,7 @@ public class TaskStorageTest {
         TaskStorage storage = new TaskStorage();
 
         assertTrue(storage.loadTasks().isEmpty());
+        assertFalse(storage.wasDataCorrupted());
     }
 
     @Test
@@ -52,6 +53,7 @@ public class TaskStorageTest {
         Deadline loadedDeadline = (Deadline) loadedTasks.get(1);
         assertEquals(LocalDateTime.of(2026, 8, 27, 18, 30), loadedDeadline.getDeadline());
         assertTrue(loadedTasks.get(2) instanceof Event);
+        assertFalse(storage.wasDataCorrupted());
     }
 
     @Test
@@ -67,10 +69,13 @@ public class TaskStorageTest {
         Files.createDirectories(STORAGE_FILE.getParent());
         Files.writeString(STORAGE_FILE, "X | 0 | Unknown task");
 
-        List<Task> loadedTasks = new TaskStorage().loadTasks();
+        TaskStorage storage = new TaskStorage();
+
+        List<Task> loadedTasks = storage.loadTasks();
 
         assertTrue(loadedTasks.isEmpty());
         assertTrue(Files.readAllLines(STORAGE_FILE).isEmpty());
+        assertTrue(storage.wasDataCorrupted());
     }
 
     @Test

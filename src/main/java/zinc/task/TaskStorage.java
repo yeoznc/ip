@@ -44,6 +44,9 @@ public class TaskStorage {
     /** The file used to retain tasks between application runs. */
     private static final Path STORAGE_FILE = Path.of("data", "zincTasks.txt");
 
+    /** Whether the most recent load found malformed task data. */
+    private boolean wasDataCorrupted;
+
     /**
      * Returns the tasks currently saved in the storage file.
      * If any line has an invalid layout, the storage file is cleared and no
@@ -53,6 +56,7 @@ public class TaskStorage {
      * @return All valid saved tasks, in their stored order.
      */
     public List<Task> loadTasks() {
+        wasDataCorrupted = false;
         List<Task> tasks = new ArrayList<>();
         if (!Files.exists(STORAGE_FILE)) {
             return tasks;
@@ -63,6 +67,7 @@ public class TaskStorage {
                     .map(this::parseTask)
                     .forEach(tasks::add);
         } catch (IllegalArgumentException exception) {
+            wasDataCorrupted = true;
             System.out.println("Saved task file has an invalid layout. Clearing saved tasks.\n");
             resetStorage();
             tasks.clear();
@@ -71,6 +76,11 @@ public class TaskStorage {
             resetStorage();
         }
         return tasks;
+    }
+
+    /** Returns whether the most recent load found malformed task data. */
+    boolean wasDataCorrupted() {
+        return wasDataCorrupted;
     }
 
     /**

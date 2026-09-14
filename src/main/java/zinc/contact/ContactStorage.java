@@ -31,12 +31,16 @@ public class ContactStorage {
     /** The file used to retain contacts between application runs. */
     private static final Path STORAGE_FILE = Path.of("data", "zincContacts.txt");
 
+    /** Whether the most recent load found malformed contact data. */
+    private boolean wasDataCorrupted;
+
     /**
      * Returns all contacts currently saved in the contact file.
      *
      * @return The saved contacts in their original order.
      */
     public List<Contact> loadContacts() {
+        wasDataCorrupted = false;
         List<Contact> contacts = new ArrayList<>();
         if (!Files.exists(STORAGE_FILE)) {
             return contacts;
@@ -47,6 +51,7 @@ public class ContactStorage {
                     .map(this::parseContact)
                     .forEach(contacts::add);
         } catch (IllegalArgumentException exception) {
+            wasDataCorrupted = true;
             System.out.println("Saved contact file has an invalid layout. Clearing saved contacts.\n");
             resetStorage();
             contacts.clear();
@@ -55,6 +60,11 @@ public class ContactStorage {
             resetStorage();
         }
         return contacts;
+    }
+
+    /** Returns whether the most recent load found malformed contact data. */
+    boolean wasDataCorrupted() {
+        return wasDataCorrupted;
     }
 
     /**

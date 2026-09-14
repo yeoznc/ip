@@ -15,9 +15,27 @@ public class ContactList {
     /** The component responsible for persisting contacts. */
     private final ContactStorage contactStorage = new ContactStorage();
 
+    /** Whether malformed contact data was found while restoring saved contacts. */
+    private final boolean wasStoredDataCorrupted;
+
+    /** The UI used to display contact-list messages. */
+    private final Ui ui;
+
     /** Creates a contact list and restores contacts saved by a previous run. */
     public ContactList() {
+        this(new Ui());
+    }
+
+    /**
+     * Creates a contact list that displays messages through the supplied UI.
+     *
+     * @param ui The UI used to display contact-list messages.
+     */
+    public ContactList(Ui ui) {
+        assert ui != null : "Contact-list UI must not be null";
+        this.ui = ui;
         contacts.addAll(contactStorage.loadContacts());
+        wasStoredDataCorrupted = contactStorage.wasDataCorrupted();
     }
 
     /**
@@ -29,10 +47,7 @@ public class ContactList {
         assert contact != null : "Contact to add must not be null";
         contacts.add(contact);
         saveContacts();
-        System.out.println(Ui.SEPARATOR + "\n"
-                + "Contact added:\n"
-                + contact + "\n"
-                + Ui.SEPARATOR + "\n");
+        ui.printContactAdded(contact.toString());
     }
 
     /**
@@ -43,16 +58,13 @@ public class ContactList {
     public void deleteContact(String name) {
         int contactIndex = findContactIndex(name);
         if (contactIndex < 0) {
-            System.out.println("No contact named \"" + name + "\" found.\n");
+            ui.printContactNotFound(name);
             return;
         }
 
         Contact deletedContact = contacts.remove(contactIndex);
         saveContacts();
-        System.out.println(Ui.SEPARATOR + "\n"
-                + "Contact deleted:\n"
-                + deletedContact + "\n"
-                + Ui.SEPARATOR + "\n");
+        ui.printContactDeleted(deletedContact.toString());
     }
 
     /**
@@ -68,7 +80,7 @@ public class ContactList {
                               String updatedDescription) {
         int contactIndex = findContactIndex(currentName);
         if (contactIndex < 0) {
-            System.out.println("No contact named \"" + currentName + "\" found.\n");
+            ui.printContactNotFound(currentName);
             return;
         }
 
@@ -82,10 +94,7 @@ public class ContactList {
                 replacementDescription);
         contacts.set(contactIndex, updatedContact);
         saveContacts();
-        System.out.println(Ui.SEPARATOR + "\n"
-                + "Contact updated:\n"
-                + updatedContact + "\n"
-                + Ui.SEPARATOR + "\n");
+        ui.printContactUpdated(updatedContact.toString());
     }
 
     /**
@@ -99,11 +108,8 @@ public class ContactList {
 
     /** Prints all contacts currently stored. */
     public void printContacts() {
-        if (contacts.isEmpty()) {
-            System.out.println("You have no contacts :(\n");
-            return;
-        }
-        contacts.forEach(System.out::println);
+        String heading = contacts.isEmpty() ? "You have no contacts yet." : "Here are your contacts:";
+        ui.printContactList(heading, contacts.stream().map(Contact::toString).toList());
     }
 
     /**
@@ -112,9 +118,14 @@ public class ContactList {
      * @param name The exact, case-sensitive name to match.
      */
     public void printContactsNamed(String name) {
-        contacts.stream()
+        List<String> matchingContacts = contacts.stream()
                 .filter(contact -> contact.getName().equals(name))
-                .forEach(System.out::println);
+                .map(Contact::toString)
+                .toList();
+        String heading = matchingContacts.isEmpty()
+                ? "No contacts named \"" + name + "\" found."
+                : "Here are the contacts named \"" + name + "\":";
+        ui.printContactList(heading, matchingContacts);
     }
     /**
      * Returns the number of stored contacts.
@@ -123,6 +134,15 @@ public class ContactList {
      */
     public int getContactCount() {
         return contacts.size();
+    }
+
+    /**
+     * Returns whether malformed contact data was found during construction.
+     *
+     * @return Whether the saved contact data was corrupted.
+     */
+    public boolean wasStoredDataCorrupted() {
+        return wasStoredDataCorrupted;
     }
 
     /** Finds the first contact with an exact, case-sensitive name match. */
