@@ -136,6 +136,12 @@ public class ContactList {
         return contacts.size();
     }
 
+    /** Returns whether a contact has the supplied exact, case-sensitive name. */
+    boolean containsContactNamed(String name) {
+        assert name != null : "Contact name must not be null";
+        return findContactIndex(name) >= 0;
+    }
+
     /**
      * Returns whether malformed contact data was found during construction.
      *

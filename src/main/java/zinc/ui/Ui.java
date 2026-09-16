@@ -1,6 +1,7 @@
 package zinc.ui;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.random.RandomGenerator;
 
 /** Handles the user-facing presentation of Zinc. */
@@ -39,8 +40,8 @@ public class Ui {
 
     /** All commands currently supported by Zinc, in alphabetical order. */
     private static final List<String> SUPPORTED_COMMANDS = List.of(
-            "bye", "contact", "deadline", "delete", "event", "find", "help", "list", "mark", "todo",
-            "ui", "unmark");
+            "bye", "contact", "ct", "deadline", "delete", "event", "find", "help", "list", "ls",
+            "mark", "todo", "ui", "unmark");
 
     /** The random source used to vary Zinc's responses. */
     private final RandomGenerator randomGenerator;
@@ -116,15 +117,41 @@ public class Ui {
         printError("The description of a todo cannot be empty.");
     }
 
+    /** Prints guidance when the user submits no command. */
+    public void printEmptyInput() {
+        printError("No command entered. Type help to see the command setlist.");
+    }
+
+    /** Prints the maximum supported command length. */
+    public void printCommandTooLong(int maximumLength) {
+        printError("That command is too long. Keep it to " + String.format(Locale.ENGLISH, "%,d", maximumLength)
+                + " characters or fewer.");
+    }
+
+    /** Prints the message used when input contains a non-printable control character. */
+    public void printUnsupportedControlCharacter() {
+        printError("That command contains an unsupported control character.");
+    }
+
+    /** Prints the message used when input contains Zinc's reserved storage separator. */
+    public void printReservedStorageSeparator() {
+        printError("The sequence \" | \" is reserved and cannot be used in a command.");
+    }
+
+    /** Prints a maximum-length error for a user-supplied field. */
+    public void printFieldTooLong(String fieldName, int maximumLength) {
+        printError(fieldName + " must be " + maximumLength + " characters or fewer.");
+    }
+
     /** Prints the usage message for the deadline command. */
     public void printDeadlineUsage() {
-        printError("Usage: deadline <description> /by <DD/MM/YY Optional[HH:MM]>");
+        printError("Usage: deadline <description> /by <DD/MM/YY> [HHMM or HH:MM]");
     }
 
     /** Prints the usage message for the event command. */
     public void printEventUsage() {
-        printError("Usage: event <description> /from <DD/MM/YY Optional[HH:MM]>"
-                + " /to <DD/MM/YY Optional[HH:MM]>");
+        printError("Usage: event <description> /from <DD/MM/YY> [HHMM or HH:MM]"
+                + " /to <DD/MM/YY> [HHMM or HH:MM]");
     }
 
     /** Prints the message used when an event ends before it starts. */
@@ -139,7 +166,7 @@ public class Ui {
 
     /** Prints the invalid date/time message. */
     public void printDateTimeError() {
-        printError("Date and time must use DD/MM/YY Optional[HH:MM].");
+        printError("Date and time must use DD/MM/YY with an optional HHMM or HH:MM time.");
     }
 
     /** Prints the usage message for the list date filter. */
@@ -167,6 +194,11 @@ public class Ui {
         printError("Contact number must contain exactly 8 digits.");
     }
 
+    /** Prints the message used when a contact name is already stored. */
+    public void printDuplicateContactName(String name) {
+        printError("A contact named \"" + name + "\" already exists.");
+    }
+
     /** Prints the usage message for UI background commands. */
     public void printUiUsage() {
         printError("Usage: ui background <morning|evening|night|auto>");
@@ -180,7 +212,12 @@ public class Ui {
 
     /** Prints the invalid task-number message for the given command. */
     public void printTaskNumberError(String command) {
-        printError("Task number must be an integer. Usage: " + command + " <task number>");
+        printError("Task number must be a positive whole number. Usage: " + command + " <task number>");
+    }
+
+    /** Prints the message used when a command does not accept trailing arguments. */
+    public void printUnexpectedArguments(String usage) {
+        printError("This command does not accept extra arguments. Usage: " + usage);
     }
 
     /** Prints a message stating that the selected task does not exist. */

@@ -1,6 +1,7 @@
 package zinc.ui;
 
 import java.util.List;
+import java.util.Locale;
 
 import zinc.contact.ContactCommandHandler;
 import zinc.contact.ContactList;
@@ -11,6 +12,12 @@ import zinc.task.TaskList;
  * Interprets top-level user commands and delegates domain operations.
  */
 public class CommandParser {
+    /** The maximum number of characters accepted in one command. */
+    private static final int MAX_COMMAND_LENGTH = 1000;
+
+    /** The sequence reserved for separating fields in Zinc's storage files. */
+    private static final String RESERVED_STORAGE_SEPARATOR = " | ";
+
     /** The command that exits Zinc. */
     private static final String EXIT_COMMAND = "bye";
 
@@ -91,14 +98,28 @@ public class CommandParser {
      */
     public boolean parseCommand(String input) {
         assert input != null : "Command input must not be null";
-        String trimmedInput = input.trim();
+        if (input.length() > MAX_COMMAND_LENGTH) {
+            ui.printCommandTooLong(MAX_COMMAND_LENGTH);
+            return false;
+        }
+        if (containsUnsupportedControlCharacter(input)) {
+            ui.printUnsupportedControlCharacter();
+            return false;
+        }
+        if (input.contains(RESERVED_STORAGE_SEPARATOR)) {
+            ui.printReservedStorageSeparator();
+            return false;
+        }
+
+        String trimmedInput = input.strip();
         if (trimmedInput.isEmpty()) {
+            ui.printEmptyInput();
             return false;
         }
 
         String[] commandParts = trimmedInput.split("\\s+", 2);
-        String command = commandParts[0];
-        String parameters = commandParts.length > 1 ? commandParts[1].trim() : "";
+        String command = commandParts[0].toLowerCase(Locale.ROOT);
+        String parameters = commandParts.length > 1 ? commandParts[1].strip() : "";
 
         if (command.equals(EXIT_COMMAND) && parameters.isEmpty()) {
             return true;
@@ -129,5 +150,11 @@ public class CommandParser {
                 .filter(commandName -> commandName.startsWith(command))
                 .toList();
         ui.printUnknownCommand(suggestedCommands);
+    }
+
+    /** Returns whether the input contains a control character other than a tab. */
+    private boolean containsUnsupportedControlCharacter(String input) {
+        return input.chars()
+                .anyMatch(character -> Character.isISOControl(character) && character != '\t');
     }
 }

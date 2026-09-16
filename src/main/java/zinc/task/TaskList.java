@@ -15,6 +15,9 @@ public class TaskList {
     /** The maximum number of tasks that can be stored. */
     private static final int MAX_TASKS = 100;
 
+    /** The message displayed when the user has no stored tasks. */
+    private static final String EMPTY_TASK_LIST_MESSAGE = "You have no tasks and is free to jam!";
+
     /** The format used when displaying a date supplied to the list command. */
     private static final DateTimeFormatter DISPLAY_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
 
@@ -76,7 +79,10 @@ public class TaskList {
      * Prints every stored task with its list number.
      */
     public void printTasks() {
-        printMatchingTasks("Here are your current tasks:", task -> true);
+        String heading = tasks.isEmpty()
+                ? EMPTY_TASK_LIST_MESSAGE
+                : "Here are your current tasks:";
+        printMatchingTasks(heading, task -> true);
     }
 
     /**

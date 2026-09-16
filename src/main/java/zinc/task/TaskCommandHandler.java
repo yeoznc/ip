@@ -5,8 +5,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import zinc.ui.Ui;
 
@@ -14,14 +17,30 @@ import zinc.ui.Ui;
  * Parses and executes commands that operate on tasks.
  */
 public class TaskCommandHandler {
-    /** Accepts a date with an optional 24-hour time, such as 31/08/26 1800. */
-    private static final DateTimeFormatter DATE_TIME_FORMAT =
+    /** The maximum number of characters accepted in a task description. */
+    private static final int MAX_DESCRIPTION_LENGTH = 300;
+
+    /** Accepts a date with a compact 24-hour time, such as 31/08/26 1800. */
+    private static final DateTimeFormatter COMPACT_DATE_TIME_FORMAT =
             DateTimeFormatter.ofPattern("dd/MM/uu HHmm")
+                    .withResolverStyle(ResolverStyle.STRICT);
+
+    /** Accepts a date with a colon-separated 24-hour time, such as 31/08/26 18:00. */
+    private static final DateTimeFormatter COLON_DATE_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("dd/MM/uu HH:mm")
                     .withResolverStyle(ResolverStyle.STRICT);
 
     /** Accepts the calendar date used to filter deadlines and events. */
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/uu")
             .withResolverStyle(ResolverStyle.STRICT);
+
+    /** Identifies the separator between a deadline description and its date. */
+    private static final Pattern DEADLINE_SEPARATOR_PATTERN = Pattern.compile("\\s+/by\\s+",
+            Pattern.CASE_INSENSITIVE);
+
+    /** Identifies event start and end field prefixes. */
+    private static final Pattern EVENT_SEPARATOR_PATTERN = Pattern.compile("\\s+/(from|to)\\s+",
+            Pattern.CASE_INSENSITIVE);
 
     /** The task list affected by commands. */
     private final TaskList taskList;
@@ -54,7 +73,7 @@ public class TaskCommandHandler {
      */
     public boolean execute(String command, String parameters) {
         assert command != null && parameters != null : "Task command input must not be null";
-        Consumer<String> selectedCommand = commands.get(command);
+        Consumer<String> selectedCommand = commands.get(command.toLowerCase(Locale.ROOT));
         if (selectedCommand == null) {
             return false;
         }
@@ -67,7 +86,7 @@ public class TaskCommandHandler {
     private Map<String, Consumer<String>> createCommands() {
         return Map.of(
                 "list", this::listTasks,
-                "ls", ignoredParameters -> taskList.printTasks(),
+                "ls", this::listTasksUsingAlias,
                 "find", this::findTasks,
                 "mark", parameters -> changeTaskCompletion(parameters, true),
                 "unmark", parameters -> changeTaskCompletion(parameters, false),
@@ -91,10 +110,23 @@ public class TaskCommandHandler {
         }
     }
 
+    /** Lists every task through the short alias when no arguments are supplied. */
+    private void listTasksUsingAlias(String parameters) {
+        if (!parameters.isEmpty()) {
+            ui.printUnexpectedArguments("ls");
+            return;
+        }
+        taskList.printTasks();
+    }
+
     /** Adds a todo when it has a description. */
     private void addTodo(String description) {
         if (description.isEmpty()) {
             ui.printTodoUsage();
+            return;
+        }
+        if (description.length() > MAX_DESCRIPTION_LENGTH) {
+            ui.printFieldTooLong("Task description", MAX_DESCRIPTION_LENGTH);
             return;
         }
 
@@ -103,16 +135,25 @@ public class TaskCommandHandler {
 
     /** Adds a deadline when it has a description and a due date. */
     private void addDeadline(String parameters) {
-        String[] deadlineParts = parameters.split(" /by ", 2);
-        boolean isIncorrectLength = deadlineParts.length != 2;
-
-        if (isIncorrectLength || deadlineParts[0].isBlank() || deadlineParts[1].isBlank()) {
+        Matcher separatorMatcher = DEADLINE_SEPARATOR_PATTERN.matcher(parameters);
+        if (!separatorMatcher.find()) {
             ui.printDeadlineUsage();
             return;
         }
 
+        String description = parameters.substring(0, separatorMatcher.start()).strip();
+        String dateTimeText = parameters.substring(separatorMatcher.end()).strip();
+        if (description.isEmpty() || dateTimeText.isEmpty() || separatorMatcher.find()) {
+            ui.printDeadlineUsage();
+            return;
+        }
+        if (description.length() > MAX_DESCRIPTION_LENGTH) {
+            ui.printFieldTooLong("Task description", MAX_DESCRIPTION_LENGTH);
+            return;
+        }
+
         try {
-            taskList.addTask(new Deadline(deadlineParts[0].trim(), parseDateTime(deadlineParts[1])));
+            taskList.addTask(new Deadline(description, parseDateTime(dateTimeText)));
         } catch (DateTimeParseException exception) {
             ui.printDateTimeError();
         }
@@ -120,12 +161,13 @@ public class TaskCommandHandler {
 
     /** Adds an event when it has a description, start time, and end time. */
     private void addEvent(String parameters) {
-        String[] eventParts = parameters.split(" /from | /to ", 3);
-        boolean isIncorrectLength = eventParts.length != 3;
-
-        if (isIncorrectLength || eventParts[0].isBlank()
-                || eventParts[1].isBlank() || eventParts[2].isBlank()) {
+        String[] eventParts = parseEventParts(parameters);
+        if (eventParts == null) {
             ui.printEventUsage();
+            return;
+        }
+        if (eventParts[0].length() > MAX_DESCRIPTION_LENGTH) {
+            ui.printFieldTooLong("Task description", MAX_DESCRIPTION_LENGTH);
             return;
         }
 
@@ -145,11 +187,37 @@ public class TaskCommandHandler {
 
     /** Converts a command date to a date-time, using midnight when no time is given. */
     private LocalDateTime parseDateTime(String dateTimeText) {
-        String normalizedDateTime = dateTimeText.trim();
+        String normalizedDateTime = dateTimeText.strip().replaceAll("\\s+", " ");
         if (!normalizedDateTime.contains(" ")) {
             normalizedDateTime += " 0000";
         }
-        return LocalDateTime.parse(normalizedDateTime, DATE_TIME_FORMAT);
+
+        try {
+            return LocalDateTime.parse(normalizedDateTime, COMPACT_DATE_TIME_FORMAT);
+        } catch (DateTimeParseException compactFormatException) {
+            return LocalDateTime.parse(normalizedDateTime, COLON_DATE_TIME_FORMAT);
+        }
+    }
+
+    /** Extracts an event description, start, and end when the field order is valid. */
+    private String[] parseEventParts(String parameters) {
+        Matcher separatorMatcher = EVENT_SEPARATOR_PATTERN.matcher(parameters);
+        if (!separatorMatcher.find() || !separatorMatcher.group(1).equalsIgnoreCase("from")) {
+            return null;
+        }
+
+        String description = parameters.substring(0, separatorMatcher.start()).strip();
+        int startValueIndex = separatorMatcher.end();
+        if (!separatorMatcher.find() || !separatorMatcher.group(1).equalsIgnoreCase("to")) {
+            return null;
+        }
+
+        String startText = parameters.substring(startValueIndex, separatorMatcher.start()).strip();
+        String endText = parameters.substring(separatorMatcher.end()).strip();
+        if (description.isEmpty() || startText.isEmpty() || endText.isEmpty() || separatorMatcher.find()) {
+            return null;
+        }
+        return new String[]{description, startText, endText};
     }
 
     /** Finds tasks whose descriptions contain the supplied keyword. */
@@ -164,24 +232,39 @@ public class TaskCommandHandler {
     /** Changes the completion state of the task at the supplied user-facing task number. */
     private void changeTaskCompletion(String parameters, boolean shouldMarkAsCompleted) {
         String command = shouldMarkAsCompleted ? "mark" : "unmark";
+        Integer taskNumber = parseTaskNumber(parameters, command);
+        if (taskNumber == null) {
+            return;
+        }
+
+        if (shouldMarkAsCompleted) {
+            taskList.markTaskAsCompleted(taskNumber);
+        } else {
+            taskList.markTaskAsIncomplete(taskNumber);
+        }
+    }
+
+    /** Parses a positive task number, printing usage guidance when it is invalid. */
+    private Integer parseTaskNumber(String parameters, String command) {
+        if (!parameters.matches("[1-9]\\d*")) {
+            ui.printTaskNumberError(command);
+            return null;
+        }
+
         try {
-            int taskNumber = Integer.parseInt(parameters);
-            if (shouldMarkAsCompleted) {
-                taskList.markTaskAsCompleted(taskNumber);
-            } else {
-                taskList.markTaskAsIncomplete(taskNumber);
-            }
+            return Integer.parseInt(parameters);
         } catch (NumberFormatException exception) {
             ui.printTaskNumberError(command);
+            return null;
         }
     }
 
     /** Deletes the task at the supplied user-facing task number. */
     private void deleteTask(String parameters) {
-        try {
-            taskList.deleteTask(Integer.parseInt(parameters));
-        } catch (NumberFormatException exception) {
-            ui.printTaskNumberError("delete");
+        Integer taskNumber = parseTaskNumber(parameters, "delete");
+        if (taskNumber == null) {
+            return;
         }
+        taskList.deleteTask(taskNumber);
     }
 }

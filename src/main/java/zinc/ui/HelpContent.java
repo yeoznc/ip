@@ -12,10 +12,11 @@ public final class HelpContent {
                     List.of("todo <description>"), List.of()),
             new HelpTopic(HelpCategory.TASKS, "Deadline", "deadline",
                     "Adds a task that must be completed by a date and optional time.",
-                    List.of("deadline <description> /by <DD/MM/YY> [HHMM]"), List.of()),
+                    List.of("deadline <description> /by <DD/MM/YY> [HHMM or HH:MM]"), List.of()),
             new HelpTopic(HelpCategory.TASKS, "Event", "event",
                     "Adds an event with a start and end date and optional times.",
-                    List.of("event <description> /from <DD/MM/YY> [HHMM] /to <DD/MM/YY> [HHMM]"),
+                    List.of("event <description> /from <DD/MM/YY> [HHMM or HH:MM]"
+                            + " /to <DD/MM/YY> [HHMM or HH:MM]"),
                     List.of()),
             new HelpTopic(HelpCategory.TASKS, "List tasks", "list",
                     "Lists every task, or tasks ending on a selected date.",

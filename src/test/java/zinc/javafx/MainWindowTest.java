@@ -13,9 +13,10 @@ import zinc.ui.BackgroundType;
 /** Tests command handling decisions made by the main JavaFX window. */
 public class MainWindowTest {
     @Test
-    public void isHelpCommand_helpWithWhitespaceAndParameters_returnsTrue() {
+    public void isHelpCommand_helpWithWhitespaceCaseAndParameters_returnsTrue() {
         assertTrue(MainWindow.isHelpCommand("help"));
         assertTrue(MainWindow.isHelpCommand("  help  "));
+        assertTrue(MainWindow.isHelpCommand("HELP"));
         assertTrue(MainWindow.isHelpCommand("help todo"));
     }
 
@@ -23,23 +24,37 @@ public class MainWindowTest {
     public void isHelpCommand_nonHelpCommands_returnsFalse() {
         assertFalse(MainWindow.isHelpCommand(""));
         assertFalse(MainWindow.isHelpCommand("helpdesk"));
-        assertFalse(MainWindow.isHelpCommand("Help"));
         assertFalse(MainWindow.isHelpCommand("todo help"));
     }
 
     @Test
+    public void isExitCommand_exitWithWhitespaceAndCase_returnsTrue() {
+        assertTrue(MainWindow.isExitCommand("bye"));
+        assertTrue(MainWindow.isExitCommand("  BYE\t"));
+    }
+
+    @Test
+    public void isExitCommand_nonExitCommands_returnsFalse() {
+        assertFalse(MainWindow.isExitCommand(""));
+        assertFalse(MainWindow.isExitCommand("bye now"));
+        assertFalse(MainWindow.isExitCommand("byebye"));
+    }
+
+    @Test
     public void getBackgroundStyleClass_timesAcrossPeriods_returnsCorrectBackground() {
-        assertEquals("background-morning", MainWindow.getBackgroundStyleClass(LocalTime.of(6, 1)));
-        assertEquals("background-sunset", MainWindow.getBackgroundStyleClass(LocalTime.of(18, 1)));
-        assertEquals("background-night", MainWindow.getBackgroundStyleClass(LocalTime.of(22, 1)));
+        assertEquals("background-morning", MainWindow.getBackgroundStyleClass(LocalTime.of(6, 0)));
+        assertEquals("background-sunset", MainWindow.getBackgroundStyleClass(LocalTime.of(18, 0)));
+        assertEquals("background-night", MainWindow.getBackgroundStyleClass(LocalTime.of(22, 0)));
+        assertEquals("background-morning", MainWindow.getBackgroundStyleClass(LocalTime.of(17, 59)));
+        assertEquals("background-sunset", MainWindow.getBackgroundStyleClass(LocalTime.of(21, 59)));
         assertEquals("background-night", MainWindow.getBackgroundStyleClass(LocalTime.of(2, 0)));
     }
 
     @Test
     public void getSidebarStyleClass_timesAcrossPeriods_returnsMatchingSidebarStyle() {
-        assertEquals("sidebar-morning", MainWindow.getSidebarStyleClass(LocalTime.of(6, 1)));
-        assertEquals("sidebar-sunset", MainWindow.getSidebarStyleClass(LocalTime.of(18, 1)));
-        assertEquals("sidebar-night", MainWindow.getSidebarStyleClass(LocalTime.of(22, 1)));
+        assertEquals("sidebar-morning", MainWindow.getSidebarStyleClass(LocalTime.of(6, 0)));
+        assertEquals("sidebar-sunset", MainWindow.getSidebarStyleClass(LocalTime.of(18, 0)));
+        assertEquals("sidebar-night", MainWindow.getSidebarStyleClass(LocalTime.of(22, 0)));
         assertEquals("sidebar-night", MainWindow.getSidebarStyleClass(LocalTime.of(2, 0)));
     }
 

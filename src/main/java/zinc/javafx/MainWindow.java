@@ -3,6 +3,7 @@ package zinc.javafx;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Objects;
 
 import javafx.animation.PauseTransition;
@@ -23,46 +24,11 @@ import zinc.ui.BackgroundType;
  * Controller for the main GUI.
  */
 public class MainWindow extends AnchorPane {
-    /** The start of the daytime background period. */
-    private static final LocalTime DAY_START_TIME = LocalTime.of(6, 0);
-
-    /** The start of the evening background period. */
-    private static final LocalTime EVENING_START_TIME = LocalTime.of(18, 0);
-
-    /** The start of the nighttime background period. */
-    private static final LocalTime NIGHT_START_TIME = LocalTime.of(22, 0);
-
-    /** The background used during the daytime period. */
-    private static final String DAY_BACKGROUND_STYLE_CLASS = "background-morning";
-
-    /** The background used during the evening period. */
-    private static final String EVENING_BACKGROUND_STYLE_CLASS = "background-sunset";
-
-    /** The background used during the nighttime period. */
-    private static final String NIGHT_BACKGROUND_STYLE_CLASS = "background-night";
-
-    /** The sidebar style class used during the daytime period. */
-    private static final String DAY_SIDEBAR_STYLE_CLASS = "sidebar-morning";
-
-    /** The sidebar style class used during the evening period. */
-    private static final String EVENING_SIDEBAR_STYLE_CLASS = "sidebar-sunset";
-
-    /** The sidebar style class used during the nighttime period. */
-    private static final String NIGHT_SIDEBAR_STYLE_CLASS = "sidebar-night";
-
     /** The CSS classes managed when the background changes. */
-    private static final String[] BACKGROUND_STYLE_CLASSES = {
-        "background-morning",
-        "background-sunset",
-        "background-night"
-    };
+    private static final List<String> BACKGROUND_STYLE_CLASSES = BackgroundStyle.getBackgroundStyleClasses();
 
     /** The sidebar style classes managed when the background changes. */
-    private static final String[] SIDEBAR_STYLE_CLASSES = {
-        DAY_SIDEBAR_STYLE_CLASS,
-        EVENING_SIDEBAR_STYLE_CLASS,
-        NIGHT_SIDEBAR_STYLE_CLASS
-    };
+    private static final List<String> SIDEBAR_STYLE_CLASSES = BackgroundStyle.getSidebarStyleClasses();
 
     /** The delay before Zinc exits after displaying its goodbye message. */
     private static final Duration EXIT_DELAY = Duration.seconds(2);
@@ -128,12 +94,11 @@ public class MainWindow extends AnchorPane {
     private void applyCurrentBackground() {
         LocalTime currentTime = LocalTime.now();
         BackgroundType selectedBackgroundType = zinc == null ? BackgroundType.AUTO : zinc.getBackgroundType();
-        String backgroundStyleClass = getBackgroundStyleClass(currentTime, selectedBackgroundType);
-        String sidebarStyleClass = getSidebarStyleClass(backgroundStyleClass);
+        BackgroundStyle selectedStyle = BackgroundStyle.fromSelection(currentTime, selectedBackgroundType);
         chatPane.getStyleClass().removeAll(BACKGROUND_STYLE_CLASSES);
-        chatPane.getStyleClass().add(backgroundStyleClass);
+        chatPane.getStyleClass().add(selectedStyle.getBackgroundStyleClass());
         sidebar.getStyleClass().removeAll(SIDEBAR_STYLE_CLASSES);
-        sidebar.getStyleClass().add(sidebarStyleClass);
+        sidebar.getStyleClass().add(selectedStyle.getSidebarStyleClass());
     }
 
     /** Re-evaluates the background whenever the main window regains focus. */
@@ -178,6 +143,8 @@ public class MainWindow extends AnchorPane {
     private void handleUserInput() {
         String input = userInput.getText();
         if (input == null || input.isBlank()) {
+            userInput.clear();
+            appendZincDialog(zinc.processCommand(input == null ? "" : input));
             return;
         }
 
@@ -188,7 +155,7 @@ public class MainWindow extends AnchorPane {
             showHelp();
             return;
         }
-        if (input.equals(EXIT_COMMAND)) {
+        if (isExitCommand(input)) {
             exitProgram();
             return;
         }
@@ -246,66 +213,43 @@ public class MainWindow extends AnchorPane {
     /** Returns the CSS background class for a supplied local time. */
     static String getBackgroundStyleClass(LocalTime time) {
         assert time != null : "Time must not be null";
-
-        if (time.isAfter(DAY_START_TIME) && time.isBefore(EVENING_START_TIME)) {
-            return DAY_BACKGROUND_STYLE_CLASS;
-        }
-        if (time.isAfter(EVENING_START_TIME) && time.isBefore(NIGHT_START_TIME)) {
-            return EVENING_BACKGROUND_STYLE_CLASS;
-        }
-        return NIGHT_BACKGROUND_STYLE_CLASS;
+        return BackgroundStyle.fromTime(time).getBackgroundStyleClass();
     }
 
     /** Returns the background CSS class for the selected mode and current time. */
     static String getBackgroundStyleClass(LocalTime time, BackgroundType selectedBackgroundType) {
         assert time != null && selectedBackgroundType != null : "Background inputs must not be null";
-        if (selectedBackgroundType == BackgroundType.AUTO) {
-            return getBackgroundStyleClass(time);
-        }
-        return switch (selectedBackgroundType) {
-            case MORNING -> DAY_BACKGROUND_STYLE_CLASS;
-            case EVENING -> EVENING_BACKGROUND_STYLE_CLASS;
-            case NIGHT -> NIGHT_BACKGROUND_STYLE_CLASS;
-            case AUTO -> throw new IllegalStateException("Automatic background should be handled earlier");
-        };
+        return BackgroundStyle.fromSelection(time, selectedBackgroundType).getBackgroundStyleClass();
     }
 
     /** Returns the sidebar CSS class for a supplied local time. */
     static String getSidebarStyleClass(LocalTime time) {
         assert time != null : "Time must not be null";
-
-        return switch (getBackgroundStyleClass(time)) {
-            case DAY_BACKGROUND_STYLE_CLASS -> DAY_SIDEBAR_STYLE_CLASS;
-            case EVENING_BACKGROUND_STYLE_CLASS -> EVENING_SIDEBAR_STYLE_CLASS;
-            case NIGHT_BACKGROUND_STYLE_CLASS -> NIGHT_SIDEBAR_STYLE_CLASS;
-            default -> throw new IllegalStateException("Unknown background style class");
-        };
-    }
-
-    /** Returns the sidebar CSS class matching a background CSS class. */
-    private static String getSidebarStyleClass(String backgroundStyleClass) {
-        return switch (backgroundStyleClass) {
-            case DAY_BACKGROUND_STYLE_CLASS -> DAY_SIDEBAR_STYLE_CLASS;
-            case EVENING_BACKGROUND_STYLE_CLASS -> EVENING_SIDEBAR_STYLE_CLASS;
-            case NIGHT_BACKGROUND_STYLE_CLASS -> NIGHT_SIDEBAR_STYLE_CLASS;
-            default -> throw new IllegalStateException("Unknown background style class");
-        };
+        return BackgroundStyle.fromTime(time).getSidebarStyleClass();
     }
 
     /** Returns whether the supplied input uses the help command word. */
     static boolean isHelpCommand(String input) {
         assert input != null : "Command input must not be null";
-        String trimmedInput = input.trim();
+        String trimmedInput = input.strip();
         if (trimmedInput.isEmpty()) {
             return false;
         }
-        return trimmedInput.split("\\s+", 2)[0].equals(HELP_COMMAND);
+        return trimmedInput.split("\\s+", 2)[0].equalsIgnoreCase(HELP_COMMAND);
+    }
+
+    /** Returns whether the supplied input is an exit command without arguments. */
+    static boolean isExitCommand(String input) {
+        assert input != null : "Command input must not be null";
+        return input.strip().equalsIgnoreCase(EXIT_COMMAND);
     }
 
     /** Loads an image resource required by the main window. */
     private static Image loadImage(String resourcePath) {
-        try (InputStream imageStream = Objects.requireNonNull(
-                MainWindow.class.getResourceAsStream(resourcePath), "Missing image resource: " + resourcePath)) {
+        InputStream imageStream = Objects.requireNonNull(
+                MainWindow.class.getResourceAsStream(resourcePath), "Missing image resource: " + resourcePath);
+
+        try (imageStream) {
             return new Image(imageStream);
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to load image resource: " + resourcePath, exception);

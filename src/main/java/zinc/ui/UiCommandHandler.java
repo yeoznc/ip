@@ -23,8 +23,8 @@ public class UiCommandHandler {
     public void execute(String parameters) {
         assert parameters != null : "UI command input must not be null";
         String[] commandParts = parameters.split("\\s+", 2);
-        String subcommand = commandParts.length > 0 ? commandParts[0] : "";
-        String arguments = commandParts.length > 1 ? commandParts[1].trim() : "";
+        String subcommand = commandParts.length > 0 ? commandParts[0].toLowerCase(Locale.ROOT) : "";
+        String arguments = commandParts.length > 1 ? commandParts[1].strip() : "";
 
         Consumer<String> selectedCommand = commands.get(subcommand);
         if (selectedCommand == null) {

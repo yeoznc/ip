@@ -30,6 +30,7 @@ public class ZincApplication extends Application {
         Scene scene = new Scene(mainWindowRoot);
         scene.getStylesheets().add(stylesheetUrl.toExternalForm());
         stage.setScene(scene);
+        stage.setTitle("Zinc");
 
         MainWindow mainWindow = fxmlLoader.getController();
         mainWindow.setZinc(zinc);

@@ -152,6 +152,23 @@ public class TaskListTest {
     }
 
     @Test
+    public void printTasks_emptyTaskList_printsEmptyTaskListMessage() {
+        TaskList taskList = new TaskList();
+
+        PrintStream originalOutput = System.out;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+        try {
+            taskList.printTasks();
+        } finally {
+            System.setOut(originalOutput);
+        }
+
+        assertTrue(output.toString().contains("You have no tasks and is free to jam!"));
+        assertFalse(output.toString().contains("Here are your current tasks:"));
+    }
+
+    @Test
     public void printTasksEndingOn_success() {
         TaskList taskList = new TaskList();
         LocalDateTime deadline = LocalDateTime.of(2026, 8, 27, 18, 0);
