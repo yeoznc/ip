@@ -6,23 +6,66 @@ beat.
 
 ![The Zinc chatbot interface](Ui.png)
 
-## Quick start
+## <span style="color: #7B61FF;">Feature Navigation</span>
 
-Enter a command in the **Message Zinc...** field and press <kbd>Enter</kbd> or select the
-**>** button. Your command and Zinc's response will appear in the conversation area.
+**<span style="color: #B56A00;">General:</span>**
+[View help](#general-help) ·
+[Change the background](#general-background) ·
+[Exit Zinc](#general-exit) ·
+[Saving data](#saving-data) ·
+[Full command list](#command-summary)
 
-The interface also provides these shortcuts:
+**<span style="color: #7B61FF;">Tasks:</span>**
+[Add a todo](#task-todo) ·
+[Add a deadline](#task-deadline) ·
+[Add an event](#task-event) ·
+[List tasks](#task-list) ·
+[Find tasks](#task-find) ·
+[Mark a task](#task-mark) ·
+[Unmark a task](#task-unmark) ·
+[Delete a task](#task-delete)
 
-- **Command List** opens Zinc's built-in command reference.
-- **Contact List** displays all saved contacts.
-- **Task List** displays all saved tasks.
-- **New conversation** clears the visible conversation and starts a fresh one. It does
-  not delete tasks or contacts.
-- **Exit** closes Zinc after displaying a goodbye message.
+**<span style="color: #008C9E;">Contacts:</span>**
+[Add a contact](#contact-add) ·
+[List or find contacts](#contact-list) ·
+[Update a contact](#contact-update) ·
+[Delete a contact](#contact-delete)
 
-See the [project README](../README.md) for installation and launch instructions.
+## <span style="color: #008C9E;">Quick Start</span>
 
-## Command notation
+### System Requirements
+
+- Java 25
+- Windows, macOS, or Linux with a graphical desktop
+
+Follow these steps to download and start Zinc:
+
+1. Ensure that Java 25 or later is installed.
+2. Download `zinc.jar` from [here](https://github.com/yeoznc/ip/releases/tag/A-Release).
+3. Place `zinc.jar` in a dedicated folder for Zinc to store data.
+4. Open a terminal in that folder.
+5. Run Zinc:
+
+   ```shell
+   java -jar zinc.jar
+   ```
+6. Select the **Message Zinc...** field and enter a command, such as
+   `todo Borrow a guitar`.
+7. Press <kbd>Enter</kbd> or select the **>** button. Read Zinc's response in the
+   conversation area.
+8. Use the interface shortcuts when needed:
+   - **Command List** opens Zinc's built-in command reference.
+   - **Contact List** displays all saved contacts.
+   - **Task List** displays all saved tasks.
+   - **New conversation** clears the visible conversation and starts a fresh one. It
+     does not delete tasks or contacts.
+9. Enter `bye` or select **Exit** when you are ready to close Zinc.
+
+When launched this way, Zinc creates a `data` directory beside `zinc.jar` to store your
+tasks and contacts. Developers who want to build Zinc from source can follow the
+[project README](../README.md).
+
+## <span style="color: #B56A00;">Command Notation</span>
 
 This guide uses the following notation:
 
@@ -36,11 +79,13 @@ This guide uses the following notation:
 Commands and field prefixes are not case-sensitive. Task descriptions, contact names,
 and other values retain the spelling and capitalisation you enter.
 
-## Managing tasks
+## <span style="color: #7B61FF;">Managing Tasks</span>
 
 Zinc supports todos, deadlines, and events. It automatically saves every change.
 
-### Adding a todo: `todo`
+<a id="task-todo"></a>
+
+### <span style="color: #7B61FF;">Adding a todo: `todo`</span>
 
 Adds a task without a date or time.
 
@@ -54,7 +99,9 @@ todo Borrow a guitar
 
 Zinc adds the todo to the task list and reports the updated number of tasks.
 
-### Adding a deadline: `deadline`
+<a id="task-deadline"></a>
+
+### <span style="color: #7B61FF;">Adding a deadline: `deadline`</span>
 
 Adds a task that must be completed by a particular date and, optionally, time.
 
@@ -69,7 +116,9 @@ deadline Buy concert tickets /by 20/09/26 18:30
 
 If no time is supplied, the deadline is stored at midnight at the start of that date.
 
-### Adding an event: `event`
+<a id="task-event"></a>
+
+### <span style="color: #7B61FF;">Adding an event: `event`</span>
 
 Adds an event with a start and end. The end cannot be earlier than the start.
 
@@ -83,7 +132,9 @@ event Band rehearsal /from 18/09/26 1900 /to 18/09/26 21:00
 
 The `/from` field must appear before `/to`. A missing time is stored as midnight.
 
-### Listing tasks: `list`
+<a id="task-list"></a>
+
+### <span style="color: #7B61FF;">Listing tasks: `list`</span>
 
 Displays every task and its number.
 
@@ -107,7 +158,9 @@ list 20/09/26
 Todos are not included in date-filtered results because they have no end date. Filtered
 results retain their original task numbers.
 
-### Finding tasks: `find`
+<a id="task-find"></a>
+
+### <span style="color: #7B61FF;">Finding tasks: `find`</span>
 
 Finds tasks whose descriptions contain a keyword or phrase.
 
@@ -121,7 +174,9 @@ find guitar
 
 The search is case-sensitive. For example, `find guitar` does not match `Guitar lesson`.
 
-### Marking a task as complete: `mark`
+<a id="task-mark"></a>
+
+### <span style="color: #7B61FF;">Marking a task as complete: `mark`</span>
 
 Marks a task as completed using its number from the task list.
 
@@ -133,7 +188,9 @@ Example:
 mark 2
 ```
 
-### Marking a task as incomplete: `unmark`
+<a id="task-unmark"></a>
+
+### <span style="color: #7B61FF;">Marking a task as incomplete: `unmark`</span>
 
 Changes a completed task back to incomplete.
 
@@ -145,7 +202,9 @@ Example:
 unmark 2
 ```
 
-### Deleting a task: `delete`
+<a id="task-delete"></a>
+
+### <span style="color: #7B61FF;">Deleting a task: `delete`</span>
 
 Permanently removes a task using its number from the task list.
 
@@ -160,7 +219,7 @@ delete 2
 Task numbers can change after a deletion, so use `list` again before performing another
 number-based action.
 
-## Managing contacts
+## <span style="color: #008C9E;">Managing Contacts</span>
 
 Each contact has a required name and optional phone number and description. Phone
 numbers, when supplied, must contain exactly eight digits. Contact names can contain
@@ -168,7 +227,9 @@ spaces, but each saved name must be unique.
 
 The shorter `ct` alias can replace `contact` in any contact command.
 
-### Adding a contact: `contact add`
+<a id="contact-add"></a>
+
+### <span style="color: #008C9E;">Adding a contact: `contact add`</span>
 
 Format: `contact add /n <name> [/p <8-digit phone number>] [/d <description>]`
 
@@ -182,7 +243,9 @@ contact add /n Freddie Mercury /p 87654321 /d Lead vocalist
 The `/p` and `/d` fields can be omitted. Zinc displays `-` for an omitted value when it
 lists the contact.
 
-### Listing and finding contacts: `contact list`
+<a id="contact-list"></a>
+
+### <span style="color: #008C9E;">Listing and finding contacts: `contact list`</span>
 
 Displays all saved contacts when no name is supplied.
 
@@ -198,7 +261,9 @@ contact list Joan Jett
 Supplying a name returns contacts with that exact, case-sensitive name. It does not
 perform a partial-name search. You can also use `contact ls`, `ct list`, or `ct ls`.
 
-### Updating a contact: `contact update`
+<a id="contact-update"></a>
+
+### <span style="color: #008C9E;">Updating a contact: `contact update`</span>
 
 Updates one or more fields of the contact with the supplied current name. Fields that
 you omit keep their existing values.
@@ -215,7 +280,9 @@ contact update Freddie Mercury /n Freddie /d Singer and songwriter
 The current name must match exactly, including capitalisation. At least one replacement
 field is required. Use `ct update` as a shorter alias.
 
-### Deleting a contact: `contact delete`
+<a id="contact-delete"></a>
+
+### <span style="color: #008C9E;">Deleting a contact: `contact delete`</span>
 
 Permanently removes the contact with the supplied exact name.
 
@@ -229,13 +296,19 @@ contact delete /n Joan Jett
 
 The aliases `contact del`, `ct delete`, and `ct del` perform the same action.
 
-## Viewing help: `help`
+## <span style="color: #B56A00;">General Features</span>
+
+<a id="general-help"></a>
+
+### <span style="color: #B56A00;">Viewing help: `help`</span>
 
 Enter `help` or select **Command List** to open Zinc's in-app command reference. The
 reference groups commands into task, contact, and general categories and shows their
 formats and aliases.
 
-## Changing the background: `ui background`
+<a id="general-background"></a>
+
+### <span style="color: #B56A00;">Changing the background: `ui background`</span>
 
 Changes the main window's background for the current session.
 
@@ -255,7 +328,9 @@ computer's local time:
 - **Evening:** 18:00 to 21:59
 - **Night:** 22:00 to 05:59
 
-## Exiting Zinc: `bye`
+<a id="general-exit"></a>
+
+### <span style="color: #B56A00;">Exiting Zinc: `bye`</span>
 
 Enter `bye` or select **Exit** to close Zinc safely.
 
@@ -263,7 +338,9 @@ Enter `bye` or select **Exit** to close Zinc safely.
 bye
 ```
 
-## Saving data
+<a id="saving-data"></a>
+
+## <span style="color: #008C9E;">Saving Data</span>
 
 Zinc automatically saves task changes to `data/zincTasks.txt` and contact changes to
 `data/zincContacts.txt`. It restores both lists the next time it starts. The `data/`
@@ -272,7 +349,10 @@ directory is excluded from Git, keeping personal data out of repository commits.
 Do not manually edit the storage files. If Zinc detects malformed saved data at startup,
 it displays a warning and starts the affected list empty.
 
-## Command summary
+<a id="command-summary"></a>
+
+## <span style="color: #7B61FF;">Command Summary</span>
+<a id = "command-summary"></a>
 
 | Purpose | Command |
 | --- | --- |
@@ -291,5 +371,3 @@ it displays a warning and starts the affected list empty.
 | Open help | `help` |
 | Change the background | `ui background <morning\|evening\|night\|auto>` |
 | Exit Zinc | `bye` |
-
-// Feature details
