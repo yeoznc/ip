@@ -2,6 +2,7 @@ package zinc.contact;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import zinc.ui.Ui;
 
@@ -113,18 +114,20 @@ public class ContactList {
     }
 
     /**
-     * Prints all contacts whose names exactly match the supplied name.
+     * Prints all contacts whose names contain the supplied keyword.
      *
-     * @param name The exact, case-sensitive name to match.
+     * @param keyword The case-insensitive keyword to search for.
      */
-    public void printContactsNamed(String name) {
+    public void printContactsContaining(String keyword) {
+        assert keyword != null : "Contact search keyword must not be null";
+        String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
         List<String> matchingContacts = contacts.stream()
-                .filter(contact -> contact.getName().equals(name))
+                .filter(contact -> contact.getName().toLowerCase(Locale.ROOT).contains(normalizedKeyword))
                 .map(Contact::toString)
                 .toList();
         String heading = matchingContacts.isEmpty()
-                ? "No contacts named \"" + name + "\" found."
-                : "Here are the contacts named \"" + name + "\":";
+                ? "No contacts containing \"" + keyword + "\" found."
+                : "Here are the contacts containing \"" + keyword + "\":";
         ui.printContactList(heading, matchingContacts);
     }
     /**

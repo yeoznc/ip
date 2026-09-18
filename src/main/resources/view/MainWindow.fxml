@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane
+        fx:id="appShell"
         prefHeight="720.0"
         prefWidth="1100.0"
         styleClass="app-shell"

@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 
 <fx:root alignment="TOP_RIGHT"
@@ -27,6 +28,7 @@
                    prefHeight="99.0" prefWidth="99.0" styleClass="avatar-frame">
             <ImageView fx:id="displayPicture" fitHeight="85.0" fitWidth="85.0"
                        pickOnBounds="true" preserveRatio="true" />
+            <Region mouseTransparent="true" styleClass="avatar-border" />
         </StackPane>
     </children>
     <padding>

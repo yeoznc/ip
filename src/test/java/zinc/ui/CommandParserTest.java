@@ -293,6 +293,18 @@ public class CommandParserTest {
     }
 
     @Test
+    public void parseCommand_taskNumberExceedsIntegerRange_printsOverflowError() {
+        TaskList taskList = new TaskList();
+        CommandParser commandParser = new CommandParser(taskList);
+        commandParser.parseCommand("todo Buy bread");
+
+        String output = captureOutput(() -> commandParser.parseCommand("mark 999999999999999999999999"));
+
+        assertTrue(output.contains("Task number is too large. Usage: mark <task number>"));
+        assertFalse(taskList.getTasks().get(0).toString().startsWith("[X]"));
+    }
+
+    @Test
     public void parseCommand_listAliasWithArguments_printsUsage() {
         CommandParser commandParser = new CommandParser(new TaskList());
 
@@ -347,6 +359,21 @@ public class CommandParserTest {
         assertEquals("Tom", contactList.getContacts().get(0).getName());
         assertEquals("91234567", contactList.getContacts().get(0).getPhoneNumber());
         assertEquals("Friend", contactList.getContacts().get(0).getDescription());
+    }
+
+    @Test
+    public void parseCommand_contactListKeyword_findsCaseInsensitiveSubstringMatches() {
+        zinc.contact.ContactList contactList = new zinc.contact.ContactList();
+        CommandParser commandParser = new CommandParser(new TaskList(), contactList);
+        commandParser.parseCommand("contact add /n Anna");
+        commandParser.parseCommand("contact add /n Joanna");
+        commandParser.parseCommand("contact add /n Tom");
+
+        String output = captureOutput(() -> commandParser.parseCommand("contact list ANN"));
+
+        assertTrue(output.contains("Name: Anna"));
+        assertTrue(output.contains("Name: Joanna"));
+        assertFalse(output.contains("Name: Tom"));
     }
 
     @Test

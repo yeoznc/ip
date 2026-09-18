@@ -254,7 +254,7 @@ public class TaskCommandHandler {
         try {
             return Integer.parseInt(parameters);
         } catch (NumberFormatException exception) {
-            ui.printTaskNumberError(command);
+            ui.printTaskNumberTooLarge(command);
             return null;
         }
     }

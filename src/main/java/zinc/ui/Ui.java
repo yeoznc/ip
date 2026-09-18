@@ -18,6 +18,10 @@ public class Ui {
     private static final List<String> ERROR_INTRODUCTIONS = List.of(
             "That note was a little off.", "Let's tune that command.", "Small soundcheck needed.");
 
+    /** Explanatory message of the CLI's "view message history" feature. */
+    private static final String MESSAGE_HISTORY_INTRODUCTION =
+            "\nTip: Press the arrow keys to view previously entered commands.";
+
     /** Messages used to greet the user. */
     private static final List<String> GREETINGS = List.of(
             "Hello, I'm Zinc. Ready to rock your tasks?",
@@ -45,6 +49,9 @@ public class Ui {
 
     /** The random source used to vary Zinc's responses. */
     private final RandomGenerator randomGenerator;
+
+    /** Whether the CLI's "view message history" feature has been introduced. */
+    private boolean hasIntroducedMessageHistoryFunction = false;
 
     /** The background selection used by the graphical interface. */
     private BackgroundType backgroundType = BackgroundType.AUTO;
@@ -164,6 +171,11 @@ public class Ui {
         printError("The task list is full. Delete a task before adding another.");
     }
 
+    /** Prints the message used when an identical task is already stored. */
+    public void printDuplicateTask() {
+        printError("That task already exists in the database. Type \"list\" to see your tasks.");
+    }
+
     /** Prints the invalid date/time message. */
     public void printDateTimeError() {
         printError("Date and time must use DD/MM/YY with an optional HHMM or HH:MM time.");
@@ -213,6 +225,11 @@ public class Ui {
     /** Prints the invalid task-number message for the given command. */
     public void printTaskNumberError(String command) {
         printError("Task number must be a positive whole number. Usage: " + command + " <task number>");
+    }
+
+    /** Prints the message used when a task number is too large for an integer. */
+    public void printTaskNumberTooLarge(String command) {
+        printError("Task number is too large. Usage: " + command + " <task number>");
     }
 
     /** Prints the message used when a command does not accept trailing arguments. */
@@ -328,7 +345,18 @@ public class Ui {
 
     /** Prints a validation or command error with a randomly selected introduction. */
     private void printError(String message) {
+        if (!hasIntroducedMessageHistoryFunction) {
+            hasIntroducedMessageHistoryFunction = true;
+            printFirstError(message);
+            return;
+        }
+
         System.out.println(selectResponse(ERROR_INTRODUCTIONS) + "\n" + message + "\n");
+    }
+
+    private void printFirstError(String message) {
+        System.out.println(selectResponse(ERROR_INTRODUCTIONS) + "\n" + message + "\n"
+                + " " + MESSAGE_HISTORY_INTRODUCTION);
     }
 
     /** Prints a message followed by a blank line. */

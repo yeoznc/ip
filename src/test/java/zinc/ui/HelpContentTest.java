@@ -30,7 +30,7 @@ public class HelpContentTest {
                 .orElseThrow();
 
         assertEquals(List.of("contact ls", "ct list", "ct ls"), contactListTopic.getAliases());
-        assertEquals(List.of("contact list [name]"), contactListTopic.getUsages());
+        assertEquals(List.of("contact list [keyword]"), contactListTopic.getUsages());
     }
 
     @Test

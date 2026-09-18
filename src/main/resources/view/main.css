@@ -7,6 +7,7 @@
 /* Navigation sidebar */
 .sidebar {
     -fx-background-color: #666666;
+    -fx-min-width: 0;
     -fx-padding: 28 18 20 18;
     -fx-spacing: 10;
 }
@@ -15,6 +16,7 @@
     -fx-background-color: #bababa;
     -fx-text-fill: white;
     -fx-background-radius: 9;
+    -fx-min-width: 0;
     -fx-padding: 12;
     -fx-font-weight: bold;
 }
@@ -50,6 +52,8 @@
 /* Chat workspace */
 .chat-pane {
     -fx-background-color: #f8f9fd;
+    -fx-min-width: 600px;
+    -fx-min-height: 400px;
     -fx-background-position: center center;
     -fx-background-repeat: no-repeat;
     -fx-background-size: cover;
@@ -97,11 +101,14 @@
 
 .avatar-frame {
     -fx-background-color: linear-gradient(to bottom right, #f1e2c9 0%, #d8b98b 100%);
-    -fx-border-color: linear-gradient(to bottom right, #c58a4a 0%, #704019 48%, #a86d34 100%);
-    -fx-border-width: 5;
     -fx-background-radius: 14;
+}
+
+.avatar-border {
+    -fx-background-color: transparent;
+    -fx-border-color: linear-gradient(to bottom right, #c58a4a 0%, #704019 48%, #a86d34 100%);
+    -fx-border-width: 7;
     -fx-border-radius: 14;
-    -fx-padding: 2;
 }
 
 .message-bubble {

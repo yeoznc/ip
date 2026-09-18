@@ -1,7 +1,12 @@
 package zinc.contact;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -50,5 +55,42 @@ public class ContactListTest {
         contactList.deleteContact("Tom");
 
         assertEquals(0, contactList.getContactCount());
+    }
+
+    @Test
+    public void printContactsContaining_caseInsensitiveSubstring_printsMatchingContacts() {
+        ContactList contactList = new ContactList();
+        contactList.addContact(new Contact("Anna", "", "Friend"));
+        contactList.addContact(new Contact("Joanna", "", "Colleague"));
+        contactList.addContact(new Contact("Tom", "", "Family"));
+
+        String output = captureOutput(() -> contactList.printContactsContaining("ANN"));
+
+        assertTrue(output.contains("Name: Anna"));
+        assertTrue(output.contains("Name: Joanna"));
+        assertFalse(output.contains("Name: Tom"));
+    }
+
+    @Test
+    public void printContactsContaining_noMatches_printsNoMatchMessage() {
+        ContactList contactList = new ContactList();
+        contactList.addContact(new Contact("Anna", "", "Friend"));
+
+        String output = captureOutput(() -> contactList.printContactsContaining("Zed"));
+
+        assertTrue(output.contains("No contacts containing \"Zed\" found."));
+    }
+
+    /** Captures console output produced by a contact-list display operation. */
+    private String captureOutput(Runnable action) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream originalOutput = System.out;
+        System.setOut(new PrintStream(output));
+        try {
+            action.run();
+        } finally {
+            System.setOut(originalOutput);
+        }
+        return output.toString(StandardCharsets.UTF_8);
     }
 }

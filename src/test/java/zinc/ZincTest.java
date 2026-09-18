@@ -1,5 +1,6 @@
 package zinc;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -52,6 +53,18 @@ public class ZincTest {
         String terminalOutput = output.toString(StandardCharsets.UTF_8);
         assertTrue(terminalOutput.contains("2. [T][ ] Second"));
         assertTrue(terminalOutput.contains("Goodbye."));
+    }
+
+    @Test
+    public void processCommand_duplicateTask_returnsWarningWithoutAddingTask() {
+        Zinc zinc = new Zinc();
+
+        zinc.processCommand("todo Tune guitar");
+        String response = zinc.processCommand("todo Tune guitar");
+
+        assertTrue(response.contains("That task already exists in the database. Type \"list\" to see your tasks."));
+        assertTrue(zinc.processCommand("list").contains("1. [T][ ] Tune guitar"));
+        assertFalse(zinc.processCommand("list").contains("2. [T][ ] Tune guitar"));
     }
 
     @Test

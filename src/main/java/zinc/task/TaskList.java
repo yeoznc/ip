@@ -69,6 +69,10 @@ public class TaskList {
             ui.printTaskListFull();
             return;
         }
+        if (tasks.stream().anyMatch(existingTask -> isDuplicate(existingTask, task))) {
+            ui.printDuplicateTask();
+            return;
+        }
 
         tasks.add(task);
         saveTasks();
@@ -123,6 +127,22 @@ public class TaskList {
     /** Formats a task with its type identifier for list output. */
     private String formatTask(Task task) {
         return task.getTaskType().getDisplayIdentifier() + task;
+    }
+
+    /** Returns whether two tasks have identical descriptions and time parameters. */
+    private boolean isDuplicate(Task existingTask, Task newTask) {
+        if (!existingTask.getDescription().equals(newTask.getDescription())
+                || existingTask.getTaskType() != newTask.getTaskType()) {
+            return false;
+        }
+        if (existingTask instanceof Deadline existingDeadline && newTask instanceof Deadline newDeadline) {
+            return existingDeadline.getDeadline().equals(newDeadline.getDeadline());
+        }
+        if (existingTask instanceof Event existingEvent && newTask instanceof Event newEvent) {
+            return existingEvent.getStart().equals(newEvent.getStart())
+                    && existingEvent.getEnd().equals(newEvent.getEnd());
+        }
+        return true;
     }
 
     /** Returns whether a deadline or event ends on the specified date. */
@@ -180,7 +200,6 @@ public class TaskList {
      */
     public void deleteTask(int taskNumber) {
         int listIndex = taskNumber - 1;
-
         if (listIndex < 0 || listIndex >= tasks.size()) {
             ui.printTaskNotFound();
             return;

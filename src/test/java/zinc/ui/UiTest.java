@@ -42,12 +42,14 @@ public class UiTest {
         String output = captureOutput(() -> {
             ui.printTaskAdded("[T][ ] Practice scales", 3);
             ui.printTaskNumberError("mark");
+            ui.printTaskNumberTooLarge("delete");
         });
 
         assertTrue(output.contains("Nice riff!"));
         assertTrue(output.contains("You have 3 tasks in the list"));
         assertTrue(output.contains("Let's tune that command."));
         assertTrue(output.contains("Usage: mark <task number>"));
+        assertTrue(output.contains("Task number is too large. Usage: delete <task number>"));
     }
 
     @Test

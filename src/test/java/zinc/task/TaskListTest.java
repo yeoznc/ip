@@ -43,7 +43,7 @@ public class TaskListTest {
     public void addTask_whenTaskListIsFull_rejectsTask() {
         TaskList taskList = new TaskList();
         for (int i = 0; i < 100; i++) {
-            taskList.addTask(new Todo("Buy bread"));
+            taskList.addTask(new Todo("Task " + i));
         }
 
         PrintStream originalOutput = System.out;
@@ -80,6 +80,51 @@ public class TaskListTest {
         taskList.addTask(deadline);
 
         assertEquals(deadline, taskList.getTasks().get(0));
+    }
+
+    @Test
+    public void addTask_duplicateTodo_rejectsTask() {
+        TaskList taskList = new TaskList();
+        taskList.addTask(new Todo("Buy bread"));
+
+        String output = captureOutput(() -> taskList.addTask(new Todo("Buy bread")));
+
+        assertEquals(1, taskList.getTaskCount());
+        assertTrue(output.contains("That task already exists in the database. Type \"list\" to see your tasks."));
+        assertFalse(output.contains("Task added to list"));
+    }
+
+    @Test
+    public void addTask_duplicateDeadline_rejectsTask() {
+        TaskList taskList = new TaskList();
+        LocalDateTime deadlineTime = LocalDateTime.parse("2030-12-26T10:30");
+        taskList.addTask(new Deadline("Buy bread", deadlineTime));
+
+        taskList.addTask(new Deadline("Buy bread", deadlineTime));
+
+        assertEquals(1, taskList.getTaskCount());
+    }
+
+    @Test
+    public void addTask_duplicateEvent_rejectsTask() {
+        TaskList taskList = new TaskList();
+        LocalDateTime start = LocalDateTime.parse("2030-12-26T10:30");
+        LocalDateTime end = LocalDateTime.parse("2030-12-26T11:30");
+        taskList.addTask(new Event("Meeting", start, end));
+
+        taskList.addTask(new Event("Meeting", start, end));
+
+        assertEquals(1, taskList.getTaskCount());
+    }
+
+    @Test
+    public void addTask_sameDescriptionWithDifferentTimeParameters_allowsTasks() {
+        TaskList taskList = new TaskList();
+        taskList.addTask(new Deadline("Buy bread", LocalDateTime.parse("2030-12-26T10:30")));
+
+        taskList.addTask(new Deadline("Buy bread", LocalDateTime.parse("2030-12-26T11:30")));
+
+        assertEquals(2, taskList.getTaskCount());
     }
 
     @Test
@@ -198,5 +243,18 @@ public class TaskListTest {
 
         assertTrue(output.toString().contains("Buy bread"));
         assertFalse(output.toString().contains("Read book"));
+    }
+
+    /** Captures output printed while executing the supplied action. */
+    private String captureOutput(Runnable action) {
+        PrintStream originalOutput = System.out;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(output));
+        try {
+            action.run();
+        } finally {
+            System.setOut(originalOutput);
+        }
+        return output.toString();
     }
 }

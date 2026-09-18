@@ -97,7 +97,7 @@ public class ContactCommandHandler {
         if (!isValidNameLength(keyword)) {
             return;
         }
-        contactList.printContactsNamed(keyword);
+        contactList.printContactsContaining(keyword);
     }
 
     /** Validates contact fields and adds a contact. */

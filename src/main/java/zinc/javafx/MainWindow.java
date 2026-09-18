@@ -8,22 +8,32 @@ import java.util.Objects;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import zinc.Zinc;
 import zinc.ui.BackgroundType;
+import zinc.ui.CommandHistory;
 
 /**
  * Controller for the main GUI.
  */
 public class MainWindow extends AnchorPane {
+    /** The proportion of the application width allocated to the sidebar. */
+    private static final double SIDEBAR_WIDTH_RATIO = 0.20;
+
+    /** The minimum width reserved for the chat pane. */
+    private static final double MINIMUM_CHAT_WIDTH = 600;
+
     /** The CSS classes managed when the background changes. */
     private static final List<String> BACKGROUND_STYLE_CLASSES = BackgroundStyle.getBackgroundStyleClasses();
 
@@ -54,6 +64,10 @@ public class MainWindow extends AnchorPane {
     /** The image displayed beside Zinc messages. */
     private final Image zincImage = loadImage("/images/zinc-avatar.png");
 
+    /** The root layout whose width drives the responsive sidebar. */
+    @FXML
+    private BorderPane appShell;
+
     /** The scrollable region containing the conversation. */
     @FXML
     private ScrollPane scrollPane;
@@ -77,14 +91,21 @@ public class MainWindow extends AnchorPane {
     /** The application instance used to process commands. */
     private Zinc zinc;
 
+    /** The commands previously submitted through this window. */
+    private final CommandHistory commandHistory = new CommandHistory();
+
     /**
      * Initializes the center pane.
      */
     @FXML
     public void initialize() {
+        sidebar.prefWidthProperty().bind(Bindings.min(
+                appShell.widthProperty().multiply(SIDEBAR_WIDTH_RATIO),
+                Bindings.max(0, appShell.widthProperty().subtract(MINIMUM_CHAT_WIDTH))));
         dialogContainer.heightProperty().addListener((ignoredObservable, ignoredOldHeight, ignoredNewHeight) -> {
             Platform.runLater(() -> scrollPane.setVvalue(BOTTOM_SCROLL_POSITION));
         });
+        userInput.addEventFilter(KeyEvent.KEY_PRESSED, this::handleCommandHistoryKeyPress);
         applyCurrentBackground();
         chatPane.sceneProperty().addListener((ignoredObservable, ignoredOldScene, newScene) ->
                 observeWindowFocus(newScene));
@@ -107,6 +128,8 @@ public class MainWindow extends AnchorPane {
             return;
         }
 
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, this::handleGlobalKeyPress);
+
         scene.windowProperty().addListener((ignoredObservable, ignoredOldWindow, newWindow) -> {
             if (newWindow != null) {
                 newWindow.focusedProperty().addListener((ignoredFocusObservable, ignoredWasFocused, isFocused) -> {
@@ -123,6 +146,29 @@ public class MainWindow extends AnchorPane {
                     applyCurrentBackground();
                 }
             });
+        }
+    }
+
+    /** Restores command-entry focus when Enter is pressed outside the input field. */
+    private void handleGlobalKeyPress(KeyEvent event) {
+        if (event.getCode() != KeyCode.ENTER || userInput.isFocused()) {
+            return;
+        }
+
+        userInput.requestFocus();
+        event.consume();
+    }
+
+    /** Replaces the input with a neighbouring command when an arrow key is pressed. */
+    private void handleCommandHistoryKeyPress(KeyEvent event) {
+        if (event.getCode() == KeyCode.UP) {
+            userInput.setText(commandHistory.navigateUp(userInput.getText()));
+            userInput.positionCaret(userInput.getText().length());
+            event.consume();
+        } else if (event.getCode() == KeyCode.DOWN) {
+            userInput.setText(commandHistory.navigateDown(userInput.getText()));
+            userInput.positionCaret(userInput.getText().length());
+            event.consume();
         }
     }
 
@@ -143,11 +189,13 @@ public class MainWindow extends AnchorPane {
     private void handleUserInput() {
         String input = userInput.getText();
         if (input == null || input.isBlank()) {
+            commandHistory.resetNavigation();
             userInput.clear();
             appendZincDialog(zinc.processCommand(input == null ? "" : input));
             return;
         }
 
+        commandHistory.addCommand(input);
         appendUserDialog(input);
         userInput.clear();
 
