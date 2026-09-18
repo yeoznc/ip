@@ -13,6 +13,7 @@ window, built-in help, and locally saved data.
 - Add, update, find, and delete contacts.
 - Save tasks and contacts automatically between sessions.
 - Open an in-app command reference with `help`.
+- Navigate previously entered commands with the Up and Down arrow keys.
 - Choose a morning, evening, or night background, or let Zinc select one automatically.
 
 ## Requirements
@@ -51,6 +52,13 @@ installation is not needed.
 
 Enter commands in the text field at the bottom of the Zinc window. Dates use
 `DD/MM/YY`; times may use either `HHMM` or `HH:MM`.
+
+### Command history
+
+Zinc remembers commands entered during the current session. Press the **Up Arrow**
+to restore the previous command or the **Down Arrow** to move towards newer commands.
+After the newest command, pressing the **Down Arrow** restores the draft that was in
+the input field before navigation began. Command history is cleared when Zinc closes.
 
 ### Tasks
 

@@ -59,7 +59,9 @@ Follow these steps to download and start Zinc:
    - **Task List** displays all saved tasks.
    - **New conversation** clears the visible conversation and starts a fresh one. It
      does not delete tasks or contacts.
-9. Enter `bye` or select **Exit** when you are ready to close Zinc.
+9. Use the **Up Arrow** and **Down Arrow** keys in the command field to navigate
+   commands entered during the current session.
+10. Enter `bye` or select **Exit** when you are ready to close Zinc.
 
 When launched this way, Zinc creates a `data` directory beside `zinc.jar` to store your
 tasks and contacts. Developers who want to build Zinc from source can follow the
@@ -258,8 +260,8 @@ contact list
 contact list Joan Jett
 ```
 
-Supplying a name returns contacts with that exact, case-sensitive name. It does not
-perform a partial-name search. You can also use `contact ls`, `ct list`, or `ct ls`.
+Supplying a keyword to search for returns contacts whose name contains that keyword in a case-insensitive manner.
+You can also use `contact ls`, `ct list`, or `ct ls`.
 
 <a id="contact-update"></a>
 
@@ -328,6 +330,18 @@ computer's local time:
 - **Evening:** 18:00 to 21:59
 - **Night:** 22:00 to 05:59
 
+<a id="general-command-history"></a>
+
+### <span style="color: #B56A00;">Navigating command history</span>
+
+Zinc remembers commands entered in the command field during the current application
+session. 
+
+Press the **Up Arrow** to restore older commands and the **Down Arrow**
+to move towards newer commands. 
+
+Command history is cleared when Zinc closes.
+
 <a id="general-exit"></a>
 
 ### <span style="color: #B56A00;">Exiting Zinc: `bye`</span>
@@ -370,4 +384,5 @@ it displays a warning and starts the affected list empty.
 | Delete a contact | `contact delete /n <name>` |
 | Open help | `help` |
 | Change the background | `ui background <morning\|evening\|night\|auto>` |
+| Navigate command history | **Up Arrow** / **Down Arrow** |
 | Exit Zinc | `bye` |
